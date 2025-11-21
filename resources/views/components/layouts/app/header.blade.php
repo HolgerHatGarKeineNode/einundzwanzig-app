@@ -4,6 +4,9 @@
     @include('partials.head')
 </head>
 <body class="min-h-screen bg-white dark:bg-zinc-800">
+<flux:toast.group>
+    <flux:toast/>
+</flux:toast.group>
 <flux:header container class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
     <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left"/>
 
@@ -29,7 +32,7 @@
             <flux:navbar.item
                 class="h-10 max-lg:hidden [&>div>svg]:size-5"
                 icon="folder-git-2"
-                href="https://github.com/laravel/livewire-starter-kit"
+                href="https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app"
                 target="_blank"
                 :label="__('Repository')"
             />
@@ -113,7 +116,9 @@
     <flux:spacer/>
 
     <flux:navlist variant="outline">
-        <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+        <flux:navlist.item icon="folder-git-2"
+                           href="https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app"
+                           target="_blank">
             {{ __('Repository') }}
         </flux:navlist.item>
 
@@ -131,6 +136,23 @@
     if (!localStorage.getItem('flux.appearance')) {
         localStorage.setItem('flux.appearance', 'dark');
     }
+    document.addEventListener('alpine:init', () => {
+        Alpine.directive('copy-to-clipboard', (el, {expression}, {evaluate}) => {
+            el.addEventListener('click', () => {
+                const text = evaluate(expression);
+                console.log(text);
+
+                navigator.clipboard.writeText(text).then(() => {
+                    Flux.toast({
+                        heading: '{{ __('Success!') }}',
+                        text: '{{ __('Copied into clipboard') }}',
+                        variant: 'success',
+                        duration: 3000
+                    });
+                }).catch(err => console.error(err));
+            });
+        });
+    });
 </script>
 
 </body>

@@ -7,9 +7,15 @@ use Livewire\WithPagination;
 new class extends Component {
     use WithPagination;
 
+    public $country = 'de';
     public $sortBy = 'name';
     public $sortDirection = 'asc';
     public $search = '';
+
+    public function mount(): void
+    {
+        $this->country = request()->route('country');
+    }
 
     public function sort($column)
     {
@@ -25,7 +31,7 @@ new class extends Component {
     {
         return [
             'meetups' => Meetup::with(['city.country', 'createdBy'])
-                ->whereHas('city.country', fn($query) => $query->where('countries.code', request()->route('country')))
+                ->whereHas('city.country', fn($query) => $query->where('countries.code', $this->country))
                 ->when($this->search, fn($query)
                     => $query->where('name', 'ilike', '%'.$this->search.'%'),
                 )
@@ -63,17 +69,22 @@ new class extends Component {
         <flux:table.rows>
             @foreach ($meetups as $meetup)
                 <flux:table.row :key="$meetup->id">
-                    <flux:table.cell variant="strong">
-                        {{ $meetup->name }}
-                        @if($meetup->city)
-                            <div class="text-xs text-zinc-500 flex items-center space-x-2">
-                                <div>{{ $meetup->city->name }}</div>
-                                @if($meetup->city->country)
-                                    <flux:separator vertical/>
-                                    <div>{{ $meetup->city->country->name }}</div>
-                                @endif
-                            </div>
-                        @endif
+                    <flux:table.cell variant="strong" class="flex items-center gap-3">
+                            <flux:avatar :href="route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country])" src="{{ $meetup->getFirstMediaUrl('logo', 'thumb') }}"/>
+                        <div>
+                            @if($meetup->city)
+                                <a href="{{ route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country]) }}">
+                                    <span>{{ $meetup->name }}</span>
+                                    <div class="text-xs text-zinc-500 flex items-center space-x-2">
+                                        <div>{{ $meetup->city->name }}</div>
+                                        @if($meetup->city->country)
+                                            <flux:separator vertical/>
+                                            <div>{{ $meetup->city->country->name }}</div>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endif
+                        </div>
                     </flux:table.cell>
 
                     <flux:table.cell>
@@ -100,7 +111,8 @@ new class extends Component {
                                 </flux:link>
                             @endif
                             @if($meetup->nostr)
-                                <flux:link :href="'https://njump.me/'.$meetup->nostr" external variant="subtle" title="Nostr">
+                                <flux:link :href="'https://njump.me/'.$meetup->nostr" external variant="subtle"
+                                           title="Nostr">
                                     <flux:icon.bolt variant="mini"/>
                                 </flux:link>
                             @endif

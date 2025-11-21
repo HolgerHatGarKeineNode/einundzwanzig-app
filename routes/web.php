@@ -16,6 +16,7 @@ Route::middleware([])
 
         Volt::route('meetups', 'meetups.index')->name('meetups.index');
         Volt::route('map', 'meetups.map')->name('meetups.map');
+        Volt::route('meetup/{meetup:slug}', 'meetups.landingpage')->name('meetups.landingpage');
     });
 
 Route::middleware(['auth'])

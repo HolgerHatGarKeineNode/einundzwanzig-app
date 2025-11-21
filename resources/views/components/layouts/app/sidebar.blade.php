@@ -4,6 +4,9 @@
     @include('partials.head')
 </head>
 <body class="min-h-screen bg-white dark:bg-zinc-800">
+<flux:toast.group>
+    <flux:toast/>
+</flux:toast.group>
 <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
     <flux:sidebar.toggle class="lg:hidden" icon="x-mark"/>
 
@@ -34,7 +37,7 @@
     <flux:spacer/>
 
     <flux:navlist variant="outline">
-        <flux:navlist.item icon="folder-git-2" href="https://git.affekt.de/einundzwanzig/einundzwanzig-app"
+        <flux:navlist.item icon="folder-git-2" href="https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app"
                            target="_blank">
             {{ __('Repository') }}
         </flux:navlist.item>
@@ -176,6 +179,23 @@
     if (!localStorage.getItem('flux.appearance')) {
         localStorage.setItem('flux.appearance', 'dark');
     }
+    document.addEventListener('alpine:init', () => {
+        Alpine.directive('copy-to-clipboard', (el, {expression}, {evaluate}) => {
+            el.addEventListener('click', () => {
+                const text = evaluate(expression);
+                console.log(text);
+
+                navigator.clipboard.writeText(text).then(() => {
+                    Flux.toast({
+                        heading: '{{ __('Success!') }}',
+                        text: '{{ __('Copied into clipboard') }}',
+                        variant: 'success',
+                        duration: 3000
+                    });
+                }).catch(err => console.error(err));
+            });
+        });
+    });
 </script>
 
 </body>

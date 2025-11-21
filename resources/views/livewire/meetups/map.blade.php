@@ -33,7 +33,7 @@ new class extends Component {
         $attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
     @endphp
     <div>
-        <flux:heading>Zoom = STRG+Scroll</flux:heading>
+        <flux:heading>{{ __('Zoom = STRG+Scroll') }}</flux:heading>
     </div>
     <div x-data="{
             markers: @js($meetups),
