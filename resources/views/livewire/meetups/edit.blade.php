@@ -1,11 +1,18 @@
 <?php
 
-use Livewire\Volt\Component;
-use App\Models\Meetup;
 use App\Models\City;
+use App\Models\Meetup;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Validate;
+use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component {
+    use WithFileUploads;
+
+    #[Validate('image|max:10240')] // 10MB Max
+    public $logo;
+
     public Meetup $meetup;
 
     // Basic Information
@@ -34,35 +41,36 @@ new class extends Component {
     public ?string $created_at = null;
     public ?string $updated_at = null;
 
-    public function mount(Meetup $meetup): void
+    public function mount(): void
     {
-        $this->meetup = $meetup;
+        $this->meetup->load('media');
 
         // Basic Information
-        $this->name = $meetup->name ?? '';
-        $this->city_id = $meetup->city_id;
-        $this->slug = $meetup->slug ?? '';
-        $this->intro = $meetup->intro;
+        $this->name = $this->meetup->name ?? '';
+        $this->city_id = $this->meetup->city_id;
+        $this->slug = $this->meetup->slug ?? '';
+        $this->intro = $this->meetup->intro;
 
         // Links and Social Media
-        $this->telegram_link = $meetup->telegram_link;
-        $this->webpage = $meetup->webpage;
-        $this->twitter_username = $meetup->twitter_username;
-        $this->matrix_group = $meetup->matrix_group;
-        $this->nostr = $meetup->nostr;
-        $this->nostr_status = $meetup->nostr_status;
-        $this->simplex = $meetup->simplex;
-        $this->signal = $meetup->signal;
+        $this->telegram_link = $this->meetup->telegram_link;
+        $this->webpage = $this->meetup->webpage;
+        $this->twitter_username = $this->meetup->twitter_username;
+        $this->matrix_group = $this->meetup->matrix_group;
+        $this->nostr = $this->meetup->nostr;
+        $this->nostr_status = $this->meetup->nostr_status;
+        $this->simplex = $this->meetup->simplex;
+        $this->signal = $this->meetup->signal;
 
         // Additional Information
-        $this->community = $meetup->community;
-        $this->github_data = $meetup->github_data ? json_encode($meetup->github_data, JSON_PRETTY_PRINT) : null;
-        $this->visible_on_map = (bool) $meetup->visible_on_map;
+        $this->community = $this->meetup->community;
+        $this->github_data = $this->meetup->github_data ? json_encode($this->meetup->github_data,
+            JSON_PRETTY_PRINT) : null;
+        $this->visible_on_map = (bool) $this->meetup->visible_on_map;
 
         // System fields
-        $this->created_by = $meetup->created_by;
-        $this->created_at = $meetup->created_at?->format('Y-m-d H:i:s');
-        $this->updated_at = $meetup->updated_at?->format('Y-m-d H:i:s');
+        $this->created_by = $this->meetup->created_by;
+        $this->created_at = $this->meetup->created_at?->format('Y-m-d H:i:s');
+        $this->updated_at = $this->meetup->updated_at?->format('Y-m-d H:i:s');
     }
 
     public function updateMeetup(): void
@@ -95,6 +103,16 @@ new class extends Component {
 
         $this->meetup->update($validated);
 
+        if ($this->logo) {
+            $this->meetup->clearMediaCollection('logo');
+            $this->meetup
+                ->addMedia($this->logo->getRealPath())
+                ->usingName($this->meetup->name)
+                ->toMediaCollection('logo');
+            $this->logo = null;
+            $this->meetup->load('media');
+        }
+
         $this->dispatch('meetup-updated', name: $this->meetup->name);
 
         session()->flash('status', __('Meetup erfolgreich aktualisiert!'));
@@ -118,6 +136,31 @@ new class extends Component {
             <flux:legend>{{ __('Grundlegende Informationen') }}</flux:legend>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <flux:file-upload wire:model="logo">
+                    <!-- Custom avatar uploader -->
+                    <div class="
+                            relative flex items-center justify-center size-20 rounded-full transition-colors cursor-pointer
+                            border border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/10
+                            bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 hover:dark:bg-white/15 in-data-dragging:dark:bg-white/15
+                        ">
+                        <!-- Show the uploaded file if it exists -->
+                        @if (!$logo && $meetup->getFirstMedia('logo'))
+                            <img src="{{ $meetup->getFirstMediaUrl('logo') }}" alt="Logo" class="size-full object-cover rounded"/>
+                        @elseif($logo)
+                            <img src="{{ $logo?->temporaryUrl() }}" alt="Logo" class="size-full object-cover rounded-full" />
+                        @else
+                            <!-- Show the default icon if no file is uploaded -->
+                            <flux:icon name="user" variant="solid" class="text-zinc-500 dark:text-zinc-400"/>
+                        @endif
+
+                        <!-- Corner upload icon -->
+                        <div class="absolute bottom-0 right-0 bg-white dark:bg-zinc-800 rounded-full">
+                            <flux:icon name="arrow-up-circle" variant="solid" class="text-zinc-500 dark:text-zinc-400"/>
+                        </div>
+                    </div>
+                </flux:file-upload>
+
                 <flux:field>
                     <flux:label>{{ __('ID') }}</flux:label>
                     <flux:input value="{{ $meetup->id }}" disabled/>
@@ -133,7 +176,8 @@ new class extends Component {
 
                 <flux:field>
                     <flux:label>{{ __('Stadt') }}</flux:label>
-                    <flux:select variant="listbox" searchable wire:model="city_id" placeholder="{{ __('Stadt auswählen') }}">
+                    <flux:select variant="listbox" searchable wire:model="city_id"
+                                 placeholder="{{ __('Stadt auswählen') }}">
                         <x-slot name="search">
                             <flux:select.search class="px-4" placeholder="{{ __('Suche passende Stadt...') }}"/>
                         </x-slot>

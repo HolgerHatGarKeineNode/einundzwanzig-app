@@ -23,8 +23,7 @@ class extends Component {
             <div class="flex justify-center">
                 <a href="/" class="group flex items-center gap-3">
                     <div>
-                        <img class="h-32 bg-white border-4 border-white"
-                             src="{{ asset('img/einundzwanzig-square.svg') }}" alt="Logo">
+                        <flux:avatar class="[:where(&)]:size-32 [:where(&)]:text-base" size="xl" src="{{ asset('img/einundzwanzig-square.svg') }}" />
                     </div>
                 </a>
             </div>
