@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -138,7 +139,7 @@ class Meetup extends Model implements HasMedia
     protected function belongsToMe(): Attribute
     {
         return Attribute::make(
-            get: fn() => false,
+            get: fn() => DB::table('meetup_user')->where('meetup_id', $this->id)->where('user_id', auth()->id())->exists(),
         );
     }
 
