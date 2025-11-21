@@ -31,14 +31,15 @@ new class extends Component {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Left Column: Meetup Details -->
         <div class="space-y-6">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-4">
                 <flux:avatar class="[:where(&)]:size-32 [:where(&)]:text-base" size="xl"
                              src="{{ $meetup->getFirstMediaUrl('logo') }}"/>
-                <div>
+                <div class="space-y-2">
                     <flux:heading size="xl" class="mb-4">{{ $meetup->name }}</flux:heading>
                     <flux:subheading class="text-gray-600 dark:text-gray-400">
                         {{ $meetup->city->name }}, {{ $meetup->city->country->name }}
                     </flux:subheading>
+                    <flux:button class="cursor-pointer" x-copy-to-clipboard="'{{ route('ics', ['meetup' => $meetup]) }}'" icon="calendar-date-range">{{ __('Kalender-Stream-URL kopieren') }}</flux:button>
                 </div>
             </div>
 
@@ -190,7 +191,10 @@ new class extends Component {
     <!-- Events Section -->
     @if($events->isNotEmpty())
         <div class="mt-16">
-            <flux:heading size="xl" class="mb-6">{{ __('Kommende Veranstaltungen') }}</flux:heading>
+            <div class="flex items-center space-x-4 mb-6">
+                <flux:heading size="xl">{{ __('Kommende Veranstaltungen') }}</flux:heading>
+                <flux:button class="cursor-pointer" x-copy-to-clipboard="'{{ route('ics', ['meetup' => $meetup]) }}'" icon="calendar-date-range">{{ __('Kalender-Stream-URL kopieren') }}</flux:button>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($events as $event)
@@ -217,9 +221,9 @@ new class extends Component {
 
                         <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                             <div class="text-xs text-zinc-500 flex items-center gap-2">
-                                <span>{{ count($event->attendees ?? []) }} Zusagen</span>
+                                <span>{{ count($event->attendees ?? []) }} {{ __('Zusagen') }}</span>
                                 <flux:separator vertical/>
-                                <span>{{ count($event->might_attendees ?? []) }} Vielleicht</span>
+                                <span>{{ count($event->might_attendees ?? []) }} {{ __('Vielleicht') }}</span>
                             </div>
                         </flux:text>
 

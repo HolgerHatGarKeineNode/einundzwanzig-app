@@ -7,9 +7,13 @@ Route::redirect('/', 'welcome');
 
 Volt::route('welcome', 'welcome')->name('welcome');
 
+Route::get('stream-calendar', \App\Http\Controllers\DownloadMeetupCalendar::class)
+    ->name('ics');
+
 Route::middleware([])
     ->prefix('/{country:code}')
     ->group(function () {
+
         Volt::route('meetups', 'meetups.index')->name('meetups.index');
         Volt::route('map', 'meetups.map')->name('meetups.map');
         Volt::route('meetup/{meetup:slug}', 'meetups.landingpage')->name('meetups.landingpage');

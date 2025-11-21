@@ -48,13 +48,16 @@ new class extends Component {
 }; ?>
 
 <div>
-    <flux:heading size="xl">{{ __('Meetups') }}</flux:heading>
-    <div class="mt-4">
-        <flux:input
-            wire:model.live="search"
-            :placeholder="__('Suche nach Meetups...')"
-            clearable
-        />
+    <div class="flex items-center justify-between">
+        <flux:heading size="xl">{{ __('Meetups') }}</flux:heading>
+        <flux:button class="cursor-pointer" x-copy-to-clipboard="'{{ route('ics') }}'" icon="calendar-date-range">{{ __('Kalender-Stream-URL kopieren') }}</flux:button>
+        <div class="mt-4">
+            <flux:input
+                wire:model.live="search"
+                :placeholder="__('Suche nach Meetups...')"
+                clearable
+            />
+        </div>
     </div>
 
     <flux:table :paginate="$meetups" class="mt-6">
@@ -95,9 +98,9 @@ new class extends Component {
                                     {{ $meetup->nextEvent['start']->format('d.m.Y H:i') }}
                                 </flux:badge>
                                 <div class="text-xs text-zinc-500 flex items-center gap-2">
-                                    <span>{{ $meetup->nextEvent['attendees'] }} Zusagen</span>
+                                    <span>{{ $meetup->nextEvent['attendees'] }} {{ __('Zusagen') }}</span>
                                     <flux:separator vertical/>
-                                    <span>{{ $meetup->nextEvent['might_attendees'] }} Vielleicht</span>
+                                    <span>{{ $meetup->nextEvent['might_attendees'] }} {{ __('Vielleicht') }}</span>
                                 </div>
                             </div>
                         @endif
@@ -106,39 +109,39 @@ new class extends Component {
                     <flux:table.cell>
                         <div class="flex gap-2">
                             @if($meetup->telegram_link)
-                                <flux:link :href="$meetup->telegram_link" external variant="subtle" title="Telegram">
+                                <flux:link :href="$meetup->telegram_link" external variant="subtle" title="{{ __('Telegram') }}">
                                     <flux:icon.paper-airplane variant="mini"/>
                                 </flux:link>
                             @endif
                             @if($meetup->webpage)
-                                <flux:link :href="$meetup->webpage" external variant="subtle" title="Website">
+                                <flux:link :href="$meetup->webpage" external variant="subtle" title="{{ __('Website') }}">
                                     <flux:icon.globe-alt variant="mini"/>
                                 </flux:link>
                             @endif
                             @if($meetup->twitter_username)
                                 <flux:link :href="'https://twitter.com/' . $meetup->twitter_username" external
-                                           variant="subtle" title="Twitter">
+                                           variant="subtle" title="{{ __('Twitter') }}">
                                     <flux:icon.x-mark variant="mini"/>
                                 </flux:link>
                             @endif
                             @if($meetup->matrix_group)
-                                <flux:link :href="$meetup->matrix_group" external variant="subtle" title="Matrix">
+                                <flux:link :href="$meetup->matrix_group" external variant="subtle" title="{{ __('Matrix') }}">
                                     <flux:icon.chat-bubble-left variant="mini"/>
                                 </flux:link>
                             @endif
                             @if($meetup->nostr)
                                 <flux:link :href="'https://njump.me/'.$meetup->nostr" external variant="subtle"
-                                           title="Nostr">
+                                           title="{{ __('Nostr') }}">
                                     <flux:icon.bolt variant="mini"/>
                                 </flux:link>
                             @endif
                             @if($meetup->simplex)
-                                <flux:link :href="$meetup->simplex" external variant="subtle" title="Simplex">
+                                <flux:link :href="$meetup->simplex" external variant="subtle" title="{{ __('Simplex') }}">
                                     <flux:icon.chat-bubble-bottom-center-text variant="mini"/>
                                 </flux:link>
                             @endif
                             @if($meetup->signal)
-                                <flux:link :href="$meetup->signal" external variant="subtle" title="Signal">
+                                <flux:link :href="$meetup->signal" external variant="subtle" title="{{ __('Signal') }}">
                                     <flux:icon.shield-check variant="mini"/>
                                 </flux:link>
                             @endif
