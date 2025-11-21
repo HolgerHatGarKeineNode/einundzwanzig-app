@@ -8,8 +8,6 @@ new class extends Component {
     use WithPagination;
 
     public $country = 'de';
-    public $sortBy = 'name';
-    public $sortDirection = 'asc';
     public $search = '';
 
     public function mount(): void
@@ -17,26 +15,23 @@ new class extends Component {
         $this->country = request()->route('country');
     }
 
-    public function sort($column)
-    {
-        if ($this->sortBy === $column) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortBy = $column;
-            $this->sortDirection = 'asc';
-        }
-    }
-
     public function with(): array
     {
         return [
-            'lecturers' => Lecturer::with(['createdBy'])
+            'lecturers' => Lecturer::with(['createdBy', 'coursesEvents' => fn($query) => $query->where('from', '>=', now())->orderBy('from', 'asc')])
+                ->withExists([
+                    'coursesEvents as has_future_events' => fn($query) => $query->where('from', '>=', now())
+                ])
+                ->withCount([
+                    'coursesEvents as future_events_count' => fn($query) => $query->where('from', '>=', now())
+                ])
                 ->when($this->search, fn($query)
                     => $query->where('name', 'ilike', '%'.$this->search.'%')
                         ->orWhere('description', 'ilike', '%'.$this->search.'%')
                         ->orWhere('subtitle', 'ilike', '%'.$this->search.'%'),
                 )
-                ->orderBy($this->sortBy, $this->sortDirection)
+                ->orderByDesc('has_future_events')
+                ->orderBy('name', 'asc')
                 ->paginate(15),
         ];
     }
@@ -61,10 +56,9 @@ new class extends Component {
 
     <flux:table :paginate="$lecturers" class="mt-6">
         <flux:table.columns>
-            <flux:table.column sortable :sorted="$sortBy === 'name'" :direction="$sortDirection"
-                               wire:click="sort('name')">{{ __('Name') }}
+            <flux:table.column>{{ __('Name') }}
             </flux:table.column>
-            <flux:table.column>{{ __('Untertitel') }}</flux:table.column>
+            <flux:table.column>{{ __('Nächster Termin') }}</flux:table.column>
             <flux:table.column>{{ __('Kurse') }}</flux:table.column>
             <flux:table.column>{{ __('Links') }}</flux:table.column>
             <flux:table.column>{{ __('Aktionen') }}</flux:table.column>
@@ -74,21 +68,35 @@ new class extends Component {
             @foreach ($lecturers as $lecturer)
                 <flux:table.row :key="$lecturer->id">
                     <flux:table.cell variant="strong" class="flex items-center gap-3">
-                        <flux:avatar size="lg" src="{{ $lecturer->getFirstMedia('avatar') ? $lecturer->getFirstMediaUrl('avatar', 'thumb') : asset('img/einundzwanzig.png') }}"/>
-                        <div>
-                            <div class="font-semibold">{{ $lecturer->name }}</div>
-                            @if($lecturer->active)
-                                <flux:badge size="sm" color="green">{{ __('Aktiv') }}</flux:badge>
-                            @else
-                                <flux:badge size="sm" color="zinc">{{ __('Inaktiv') }}</flux:badge>
-                            @endif
+                        <div class="flex items-center gap-3">
+                            <flux:avatar size="lg" src="{{ $lecturer->getFirstMedia('avatar') ? $lecturer->getFirstMediaUrl('avatar', 'thumb') : asset('img/einundzwanzig.png') }}"/>
+                            <div>
+                                <div class="font-semibold">{{ $lecturer->name }}</div>
+                                @if($lecturer->active)
+                                    <flux:badge size="sm" color="green">{{ __('Aktiv') }}</flux:badge>
+                                @else
+                                    <flux:badge size="sm" color="zinc">{{ __('Inaktiv') }}</flux:badge>
+                                @endif
+                            </div>
                         </div>
                     </flux:table.cell>
 
                     <flux:table.cell>
-                        @if($lecturer->subtitle)
-                            <div class="text-sm text-zinc-600 dark:text-zinc-400">
-                                {{ Str::limit($lecturer->subtitle, 50) }}
+                        @php
+                            $nextEvent = $lecturer->coursesEvents->first();
+                        @endphp
+                        @if($nextEvent)
+                            <div class="flex flex-col gap-1">
+                                <a href="{{ route('courses.landingpage', ['course' => $nextEvent->course, 'country' => $country]) }}">
+                                    <flux:badge color="green" size="sm">
+                                        {{ $nextEvent->from->format('d.m.Y H:i') }}
+                                    </flux:badge>
+                                </a>
+                                @if($lecturer->future_events_count > 1)
+                                    <div class="text-xs text-zinc-500">
+                                        +{{ $lecturer->future_events_count - 1 }} {{ __('weitere Termine') }}
+                                    </div>
+                                @endif
                             </div>
                         @endif
                     </flux:table.cell>

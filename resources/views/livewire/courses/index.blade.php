@@ -113,7 +113,8 @@ new class extends Component {
                             {{ __('Bearbeiten') }}
                         </flux:button>
                         <flux:button
-                            :href="route_with_country('courses.events.create', ['course' => $course])"
+                            :disabled="$course->created_by !== auth()->id()"
+                            :href="$course->created_by === auth()->id() ? route_with_country('courses.events.create', ['course' => $course]) : null"
                             size="xs"
                             variant="filled"
                             icon="calendar">
