@@ -8,6 +8,13 @@ use Flux\Flux;
 new class extends Component {
     public $selectedMeetupId = null;
 
+    public $country = 'de';
+
+    public function mount(): void
+    {
+        $this->country = request()->route('country');
+    }
+
     public function addMeetup()
     {
         if ($this->selectedMeetupId) {
@@ -34,7 +41,8 @@ new class extends Component {
         $user = auth()->user();
 
         // Meine Meetups
-        $myMeetups = $user->meetups()
+        $myMeetups = $user
+            ->meetups()
             ->with(['city.country'])
             ->get();
 
@@ -45,11 +53,11 @@ new class extends Component {
             ->get();
 
         // Meine nächsten Meetup Termine
-        $myUpcomingEvents = MeetupEvent::whereHas('meetup', function($query) use ($user) {
-                $query->whereHas('users', function($q) use ($user) {
-                    $q->where('users.id', $user->id);
-                });
-            })
+        $myUpcomingEvents = MeetupEvent::whereHas('meetup', function ($query) use ($user) {
+            $query->whereHas('users', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
+        })
             ->where('start', '>=', now())
             ->with(['meetup.city.country'])
             ->orderBy('start')
@@ -73,7 +81,8 @@ new class extends Component {
                     <flux:separator class="my-4"/>
                     <div class="space-y-3">
                         @foreach($myUpcomingEvents as $event)
-                            <a href="{{ route('meetups.landingpage-event', ['meetup' => $event->meetup->slug, 'event' => $event->id, 'country' => $event->meetup->city->country->code]) }}" class="block hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg p-3 -m-3 transition-colors">
+                            <a href="{{ route('meetups.landingpage-event', ['meetup' => $event->meetup->slug, 'event' => $event->id, 'country' => $event->meetup->city->country->code]) }}"
+                               class="block hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg p-3 -m-3 transition-colors">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="flex-1">
                                         <div class="font-medium">{{ $event->meetup->name }}</div>
@@ -93,18 +102,22 @@ new class extends Component {
                 @endif
             </div>
         </div>
-        <div class="2xl:col-span-2 relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+        <div
+            class="2xl:col-span-2 relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
             <div class="p-6">
                 <flux:heading size="lg" class="mb-4">{{ __('Meine Meetups') }}</flux:heading>
 
-                <flux:select variant="listbox" searchable placeholder="{{ __('Meetup hinzufügen...') }}" wire:model="selectedMeetupId" wire:change="addMeetup">
+                <flux:select variant="listbox" searchable placeholder="{{ __('Meetup hinzufügen...') }}"
+                             wire:model="selectedMeetupId" wire:change="addMeetup">
                     <x-slot name="search">
                         <flux:select.search class="px-4" placeholder="{{ __('Meetup suchen...') }}"/>
                     </x-slot>
                     @foreach($availableMeetups as $meetup)
                         <flux:select.option value="{{ $meetup->id }}">
                             <div class="flex items-center space-x-2">
-                                <img alt="{{ $meetup->name }}" src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}" width="24" height="24" class="rounded"/>
+                                <img alt="{{ $meetup->name }}"
+                                     src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"
+                                     width="24" height="24" class="rounded"/>
                                 <div>
                                     <span class="font-medium">{{ $meetup->name }}</span>
                                     @if($meetup->city)
@@ -122,42 +135,54 @@ new class extends Component {
                         @foreach($myMeetups as $meetup)
                             <div class="flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3 flex-1">
-                                    <flux:avatar size="sm" src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
-                                    <div>
-                                        <div class="font-medium">{{ $meetup->name }}</div>
-                                        <div class="text-xs text-zinc-500">
-                                            {{ $meetup->city->name }}
+                                    <flux:avatar
+                                        :href="route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country])"
+                                        size="sm"
+                                        src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
+                                    <a href="{{ route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country]) }}">
+                                        <div>
+                                            <div class="font-medium">{{ $meetup->name }}</div>
+                                            <div class="text-xs text-zinc-500">
+                                                {{ $meetup->city->name }}
+                                            </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <flux:button :href="route_with_country('meetups.edit', ['meetup' => $meetup])" size="xs" variant="ghost" icon="pencil">
+                                    <flux:button :href="route_with_country('meetups.edit', ['meetup' => $meetup])"
+                                                 size="xs" variant="ghost" icon="pencil">
                                         {{ __('Bearbeiten') }}
                                     </flux:button>
                                     <flux:modal.trigger :name="'remove-meetup-' . $meetup->id">
-                                        <flux:button class="cursor-pointer" size="xs" variant="danger" icon="trash"></flux:button>
+                                        <flux:button class="cursor-pointer" size="xs" variant="danger"
+                                                     icon="trash"></flux:button>
                                     </flux:modal.trigger>
                                 </div>
 
-                                <flux:modal wire:key="remove-meetup-{{ $meetup->id }}" :name="'remove-meetup-' . $meetup->id" class="min-w-[22rem]">
+                                <flux:modal wire:key="remove-meetup-{{ $meetup->id }}"
+                                            :name="'remove-meetup-' . $meetup->id" class="min-w-[22rem]">
                                     <div class="space-y-6">
                                         <div>
                                             <flux:heading size="lg">{{ __('Meetup entfernen?') }}</flux:heading>
 
                                             <flux:text class="mt-2">
-                                                {{ __('Möchtest du') }} "{{ $meetup->name }}" {{ __('aus deinen Meetups entfernen?') }}<br>
+                                                {{ __('Möchtest du') }} "{{ $meetup->name }}
+                                                " {{ __('aus deinen Meetups entfernen?') }}<br>
                                                 {{ __('Du kannst es jederzeit wieder hinzufügen.') }}
                                             </flux:text>
                                         </div>
 
                                         <div class="flex gap-2">
-                                            <flux:spacer />
+                                            <flux:spacer/>
 
                                             <flux:modal.close>
-                                                <flux:button class="cursor-pointer" variant="ghost">{{ __('Abbrechen') }}</flux:button>
+                                                <flux:button class="cursor-pointer"
+                                                             variant="ghost">{{ __('Abbrechen') }}</flux:button>
                                             </flux:modal.close>
 
-                                            <flux:button class="cursor-pointer" wire:click="removeMeetup({{ $meetup->id }})" variant="danger">{{ __('Entfernen') }}</flux:button>
+                                            <flux:button class="cursor-pointer"
+                                                         wire:click="removeMeetup({{ $meetup->id }})"
+                                                         variant="danger">{{ __('Entfernen') }}</flux:button>
                                         </div>
                                     </div>
                                 </flux:modal>
