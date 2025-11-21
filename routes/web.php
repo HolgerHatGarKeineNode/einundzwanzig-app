@@ -103,6 +103,6 @@ Route::middleware(['auth'])
         Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     });
 
-Route::feeds();
+//Route::feeds();
 
 require __DIR__.'/auth.php';
