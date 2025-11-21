@@ -18,7 +18,8 @@ new class extends Component {
     {
         return [
             'meetup' => $this->meetup,
-            'events' => $this->meetup->meetupEvents()
+            'events' => $this->meetup
+                ->meetupEvents()
                 ->where('start', '>=', now())
                 ->orderBy('start', 'asc')
                 ->get(),
@@ -31,7 +32,8 @@ new class extends Component {
         <!-- Left Column: Meetup Details -->
         <div class="space-y-6">
             <div class="flex items-center space-x-2">
-                <flux:avatar class="[:where(&)]:size-32 [:where(&)]:text-base" size="xl" src="{{ $meetup->getFirstMediaUrl('logo') }}" />
+                <flux:avatar class="[:where(&)]:size-32 [:where(&)]:text-base" size="xl"
+                             src="{{ $meetup->getFirstMediaUrl('logo') }}"/>
                 <div>
                     <flux:heading size="xl" class="mb-4">{{ $meetup->name }}</flux:heading>
                     <flux:subheading class="text-gray-600 dark:text-gray-400">
@@ -52,45 +54,51 @@ new class extends Component {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @if($meetup->webpage)
-                        <flux:button href="{{ $meetup->webpage }}" target="_blank" variant="ghost" class="justify-start">
-                            <flux:icon.globe-alt class="w-5 h-5 mr-2" />
+                        <flux:button href="{{ $meetup->webpage }}" target="_blank" variant="ghost"
+                                     class="justify-start">
+                            <flux:icon.globe-alt class="w-5 h-5 mr-2"/>
                             Webseite
                         </flux:button>
                     @endif
 
                     @if($meetup->telegram_link)
-                        <flux:button href="{{ $meetup->telegram_link }}" target="_blank" variant="ghost" class="justify-start">
-                            <flux:icon.chat-bubble-left-right class="w-5 h-5 mr-2" />
+                        <flux:button href="{{ $meetup->telegram_link }}" target="_blank" variant="ghost"
+                                     class="justify-start">
+                            <flux:icon.chat-bubble-left-right class="w-5 h-5 mr-2"/>
                             Telegram
                         </flux:button>
                     @endif
 
                     @if($meetup->twitter_username)
-                        <flux:button href="https://twitter.com/{{ $meetup->twitter_username }}" target="_blank" variant="ghost" class="justify-start">
+                        <flux:button href="https://twitter.com/{{ $meetup->twitter_username }}" target="_blank"
+                                     variant="ghost" class="justify-start">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                             </svg>
                             Twitter/X
                         </flux:button>
                     @endif
 
                     @if($meetup->matrix_group)
-                        <flux:button href="{{ $meetup->matrix_group }}" target="_blank" variant="ghost" class="justify-start">
-                            <flux:icon.hashtag class="w-5 h-5 mr-2" />
+                        <flux:button href="{{ $meetup->matrix_group }}" target="_blank" variant="ghost"
+                                     class="justify-start">
+                            <flux:icon.hashtag class="w-5 h-5 mr-2"/>
                             Matrix
                         </flux:button>
                     @endif
 
                     @if($meetup->signal)
                         <flux:button href="{{ $meetup->signal }}" target="_blank" variant="ghost" class="justify-start">
-                            <flux:icon.phone class="w-5 h-5 mr-2" />
+                            <flux:icon.phone class="w-5 h-5 mr-2"/>
                             Signal
                         </flux:button>
                     @endif
 
                     @if($meetup->simplex)
-                        <flux:button href="{{ $meetup->simplex }}" target="_blank" variant="ghost" class="justify-start">
-                            <flux:icon.chat-bubble-oval-left-ellipsis class="w-5 h-5 mr-2" />
+                        <flux:button href="{{ $meetup->simplex }}" target="_blank" variant="ghost"
+                                     class="justify-start">
+                            <flux:icon.chat-bubble-oval-left-ellipsis class="w-5 h-5 mr-2"/>
                             SimpleX
                         </flux:button>
                     @endif
@@ -98,7 +106,8 @@ new class extends Component {
                     @if($meetup->nostr)
                         <div class="col-span-full">
                             <flux:heading size="sm" class="mb-2">Nostr</flux:heading>
-                            <code x-copy-to-clipboard="'{{ $meetup->nostr }}'" class="cursor-pointer block p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs break-all">{{ $meetup->nostr }}</code>
+                            <code x-copy-to-clipboard="'{{ $meetup->nostr }}'"
+                                  class="cursor-pointer block p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs break-all">{{ $meetup->nostr }}</code>
                         </div>
                     @endif
                 </div>
@@ -118,7 +127,7 @@ new class extends Component {
                 #meetup-map {
                     height: 70vh;
                     min-height: 500px;
-                    z-index: 0!important;
+                    z-index: 0 !important;
                 }
 
                 #meetup-map:focus {
@@ -185,21 +194,22 @@ new class extends Component {
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($events as $event)
-                    <a href="{{ route('meetups.landingpage-event', ['meetup' => $meetup->slug, 'event' => $event->id, 'country' => $country]) }}" aria-label="{{ $event->description ?? 'Event details' }}">
+                    <a href="{{ route('meetups.landingpage-event', ['meetup' => $meetup->slug, 'event' => $event->id, 'country' => $country]) }}"
+                       aria-label="{{ $event->description ?? 'Event details' }}">
                         <flux:card size="sm" class="hover:bg-zinc-50 dark:hover:bg-zinc-700 h-full">
                             <flux:heading class="flex items-center gap-2">
                                 {{ $event->start->format('d.m.Y') }}
-                                <flux:icon name="arrow-up-right" class="ml-auto text-zinc-400" variant="micro" />
+                                <flux:icon name="arrow-up-right" class="ml-auto text-zinc-400" variant="micro"/>
                             </flux:heading>
 
                             <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                                <flux:icon.clock class="inline w-4 h-4" />
+                                <flux:icon.clock class="inline w-4 h-4"/>
                                 {{ $event->start->format('H:i') }} Uhr
                             </flux:text>
 
                             @if($event->location)
                                 <flux:text class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                                    <flux:icon.map-pin class="inline w-4 h-4" />
+                                    <flux:icon.map-pin class="inline w-4 h-4"/>
                                     {{ $event->location }}
                                 </flux:text>
                             @endif
@@ -207,6 +217,14 @@ new class extends Component {
                             @if($event->description)
                                 <flux:text class="mt-2">{{ Str::limit($event->description, 100) }}</flux:text>
                             @endif
+
+                            <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                                <div class="text-xs text-zinc-500 flex items-center gap-2">
+                                    <span>{{ count($event->attendees ?? []) }} Zusagen</span>
+                                    <flux:separator vertical/>
+                                    <span>{{ count($event->might_attendees ?? []) }} Vielleicht</span>
+                                </div>
+                            </flux:text>
                         </flux:card>
                     </a>
                 @endforeach
