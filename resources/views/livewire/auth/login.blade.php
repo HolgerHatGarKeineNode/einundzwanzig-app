@@ -172,7 +172,7 @@ class extends Component {
                 {{--<flux:checkbox wire:model="remember" label="Remember me for 30 days" />--}}
 
                 <!-- Submit Button -->
-                <flux:button class="cursor-pointer" variant="primary" @click="openNostrLogin" class="w-full">{{ __('Log in mit Nostr') }}</flux:button>
+                <flux:button variant="primary" @click="openNostrLogin" class="w-full cursor-pointer">{{ __('Log in mit Nostr') }}</flux:button>
             </div>
 
             <!-- Sign up Link -->

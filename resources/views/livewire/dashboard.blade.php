@@ -73,17 +73,19 @@ new class extends Component {
                     <flux:separator class="my-4"/>
                     <div class="space-y-3">
                         @foreach($myUpcomingEvents as $event)
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="flex-1">
-                                    <div class="font-medium">{{ $event->meetup->name }}</div>
-                                    <div class="text-sm text-zinc-500">
-                                        {{ $event->meetup->city->name }}, {{ $event->meetup->city->country->name }}
+                            <a href="{{ route('meetups.landingpage-event', ['meetup' => $event->meetup->slug, 'event' => $event->id, 'country' => $event->meetup->city->country->code]) }}" class="block hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg p-3 -m-3 transition-colors">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1">
+                                        <div class="font-medium">{{ $event->meetup->name }}</div>
+                                        <div class="text-sm text-zinc-500">
+                                            {{ $event->meetup->city->name }}, {{ $event->meetup->city->country->name }}
+                                        </div>
+                                        <flux:badge color="green" size="sm" class="mt-1">
+                                            {{ $event->start->format('d.m.Y H:i') }}
+                                        </flux:badge>
                                     </div>
-                                    <flux:badge color="green" size="sm" class="mt-1">
-                                        {{ $event->start->format('d.m.Y H:i') }}
-                                    </flux:badge>
                                 </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 @else
