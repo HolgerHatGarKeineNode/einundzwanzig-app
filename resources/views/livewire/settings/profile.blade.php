@@ -109,6 +109,41 @@ new class extends Component {
             </div>
         </form>
 
+        <div class="my-8">
+            <flux:heading size="lg" class="mb-4">{{ __('Spracheinstellungen') }}</flux:heading>
+            <flux:subheading class="mb-6">{{ __('Wähle deine Sprache aus...') }}</flux:subheading>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                @php
+                    $languages = [
+                        'de' => ['name' => 'Deutsch', 'countries' => ['de-DE', 'de-AT', 'de-CH']],
+                        'en' => ['name' => 'English', 'countries' => ['en-GB', 'en-US', 'en-AU', 'en-CA']],
+                        'es' => ['name' => 'Español', 'countries' => ['es-ES', 'es-CL', 'es-CO']],
+                    ];
+                    $currentLangCountry = session('lang_country', config('lang-country.fallback'));
+                @endphp
+
+                @foreach($languages as $langCode => $langData)
+                    @foreach($langData['countries'] as $langCountry)
+                        @php
+                            [$lang, $countryCode] = explode('-', $langCountry);
+                            $isActive = $currentLangCountry === $langCountry;
+                        @endphp
+                        <a href="{{ route('lang_country.switch', ['lang_country' => $langCountry]) }}"
+                           class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors {{ $isActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : 'border-zinc-200 dark:border-zinc-700' }}">
+                            <img
+                                alt="{{ strtolower($countryCode) }}"
+                                src="{{ asset('vendor/blade-flags/country-'.strtolower($countryCode).'.svg') }}"
+                                class="w-12 h-8 mb-2 object-cover"
+                            />
+                            <span class="text-sm font-medium">{{ $langData['name'] }}</span>
+                            <span class="text-xs text-zinc-500">{{ strtoupper($countryCode) }}</span>
+                        </a>
+                    @endforeach
+                @endforeach
+            </div>
+        </div>
+
         <livewire:settings.delete-user-form />
     </x-settings.layout>
 </section>

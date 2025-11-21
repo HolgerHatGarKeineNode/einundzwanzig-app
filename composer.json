@@ -32,6 +32,7 @@
         "spatie/laravel-sluggable": "^3.7",
         "spatie/laravel-tags": "^4.10",
         "staudenmeir/eloquent-has-many-deep": "^1.21",
+        "stefro/laravel-lang-country": "^4.1",
         "woodsandwalker/laravel-countries": "^1.5"
     },
     "require-dev": {

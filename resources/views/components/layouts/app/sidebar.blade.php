@@ -69,6 +69,11 @@
     <flux:spacer/>
 
     <flux:navlist variant="outline">
+        <flux:navlist.item icon="language" :href="route('settings.profile')"
+                           :current="request()->routeIs('settings.profile')"
+                           wire:navigate>
+            {{ __('Sprache wechseln') }}
+        </flux:navlist.item>
         <flux:navlist.item icon="folder-git-2"
                            href="https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app"
                            target="_blank">

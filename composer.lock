@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71cfd7a3c92c2083fc928354e95d456b",
+    "content-hash": "2f835aeeb5cb6ca796bf1916be38cabf",
     "packages": [
         {
             "name": "akuechler/laravel-geoly",
@@ -6288,6 +6288,70 @@
                 "source": "https://github.com/staudenmeir/eloquent-has-many-deep-contracts/tree/v1.3"
             },
             "time": "2025-02-15T17:11:01+00:00"
+        },
+        {
+            "name": "stefro/laravel-lang-country",
+            "version": "4.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stefro/laravel-lang-country.git",
+                "reference": "f8f5bddc4ff93ebee8bade292c7f75256ea1a841"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stefro/laravel-lang-country/zipball/f8f5bddc4ff93ebee8bade292c7f75256ea1a841",
+                "reference": "f8f5bddc4ff93ebee8bade292c7f75256ea1a841",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.1|^8.2"
+            },
+            "require-dev": {
+                "barryvdh/laravel-ide-helper": "^2.13|^3.0",
+                "friendsofphp/php-cs-fixer": "^3.22",
+                "orchestra/testbench": "^7.0|^8.0|^9.0",
+                "pestphp/pest": "^1.21 | ^2.0 | ^3.0",
+                "pestphp/pest-plugin-type-coverage": "^2.0|^3.0",
+                "spatie/laravel-ray": "^1.32"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "LangCountry": "Stefro\\LaravelLangCountry\\LangCountryFacade"
+                    },
+                    "providers": [
+                        "Stefro\\LaravelLangCountry\\LaravelLangCountryServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Stefro\\LaravelLangCountry\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stef Rouschop",
+                    "email": "github@rouschop.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Setting the locale is not enough most of the time, some countries use more than one languages. Also, different countries use different date notation formats, names, flags and currencies. This package is here to help you with that!",
+            "homepage": "https://github.com/stefro/laravel-lang-country",
+            "keywords": [
+                "LaravelLangCountry"
+            ],
+            "support": {
+                "issues": "https://github.com/stefro/laravel-lang-country/issues",
+                "source": "https://github.com/stefro/laravel-lang-country/tree/4.1.6"
+            },
+            "time": "2025-11-13T06:15:42+00:00"
         },
         {
             "name": "symfony/clock",
