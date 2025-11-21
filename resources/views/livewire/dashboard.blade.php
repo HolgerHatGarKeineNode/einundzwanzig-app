@@ -135,7 +135,7 @@ new class extends Component {
                                         {{ __('Bearbeiten') }}
                                     </flux:button>
                                     <flux:modal.trigger :name="'remove-meetup-' . $meetup->id">
-                                        <flux:button size="xs" variant="danger" icon="trash"></flux:button>
+                                        <flux:button class="cursor-pointer" size="xs" variant="danger" icon="trash"></flux:button>
                                     </flux:modal.trigger>
                                 </div>
 
@@ -154,10 +154,10 @@ new class extends Component {
                                             <flux:spacer />
 
                                             <flux:modal.close>
-                                                <flux:button variant="ghost">{{ __('Abbrechen') }}</flux:button>
+                                                <flux:button class="cursor-pointer" variant="ghost">{{ __('Abbrechen') }}</flux:button>
                                             </flux:modal.close>
 
-                                            <flux:button wire:click="removeMeetup({{ $meetup->id }})" variant="danger">{{ __('Entfernen') }}</flux:button>
+                                            <flux:button class="cursor-pointer" wire:click="removeMeetup({{ $meetup->id }})" variant="danger">{{ __('Entfernen') }}</flux:button>
                                         </div>
                                     </div>
                                 </flux:modal>
