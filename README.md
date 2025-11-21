@@ -1,10 +1,10 @@
-[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2Fb7221607-01f1-4a61-a0d9-b98c61ef1b1b&style=plastic)](https://portal.codingarena.top/welcome)
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2Fb7221607-01f1-4a61-a0d9-b98c61ef1b1b&style=plastic)](https://portal.einundzwanzig.space)
 
-Demo: [https://portal.codingarena.top/welcome](https://portal.codingarena.top/welcome)
+Hosted: [https://portal.einundzwanzig.space](https://portal.einundzwanzig.space)
 
 ## Contributing and Proposals
 
-[https://gitworkshop.dev](https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app)
+[https://gittr.space](https://gittr.space/npub1pt0kw36ue3w2g4haxq3wgm6a2fhtptmzsjlc2j2vphtcgle72qesgpjyc6/einundzwanzig-app?file=README.md)
 
 ## Development
 
@@ -48,7 +48,7 @@ docker run --rm \
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within this project, please go to [https://gitworkshop.dev](https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within this project, please go to [https://gittr.space](https://gittr.space/npub1pt0kw36ue3w2g4haxq3wgm6a2fhtptmzsjlc2j2vphtcgle72qesgpjyc6/einundzwanzig-app?file=README.md). All security vulnerabilities will be promptly addressed.
 
 ## License
 
