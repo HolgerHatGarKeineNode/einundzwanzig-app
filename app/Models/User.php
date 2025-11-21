@@ -9,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 use ParagonIE\CipherSweet\BlindIndex;
 use ParagonIE\CipherSweet\EncryptedRow;
 use ParagonIE\CipherSweet\JsonFieldMap;
@@ -22,6 +23,7 @@ class User extends Authenticatable implements CipherSweetEncrypted
     use HasFactory;
     use Notifiable;
     use HasRoles;
+    use HasApiTokens;
 
     protected $guarded = [];
 

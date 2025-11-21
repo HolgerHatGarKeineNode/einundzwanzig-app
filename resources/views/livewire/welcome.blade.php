@@ -52,6 +52,10 @@ class extends Component {
                     </x-slot>
                     {{ __('Kartenansicht öffnen') }}
                 </flux:button>
+
+                <flux:button :href="route('dashboard', ['country' => 'de'])" class="cursor-pointer w-full" icon="arrow-right-start-on-rectangle">
+                    {{ __('Login') }}
+                </flux:button>
             </div>
         </div>
     </div>

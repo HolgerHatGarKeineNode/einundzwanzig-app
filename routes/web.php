@@ -5,6 +5,14 @@ use Livewire\Volt\Volt;
 
 Route::redirect('/', 'welcome');
 
+Route::get('/img/{path}', \App\Http\Controllers\ImageController::class)
+    ->where('path', '.*')
+    ->name('img');
+
+Route::get('/img-public/{path}', \App\Http\Controllers\ImageController::class)
+    ->where('path', '.*')
+    ->name('imgPublic');
+
 Volt::route('welcome', 'welcome')->name('welcome');
 
 Route::get('stream-calendar', \App\Http\Controllers\DownloadMeetupCalendar::class)
