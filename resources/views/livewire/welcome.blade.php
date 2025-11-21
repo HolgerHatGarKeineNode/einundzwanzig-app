@@ -57,6 +57,9 @@ class extends Component {
                     {{ __('Login') }}
                 </flux:button>
             </div>
+
+            <!-- Language Selection Accordion -->
+            <x-einundzwanzig.language-selector/>
         </div>
     </div>
 

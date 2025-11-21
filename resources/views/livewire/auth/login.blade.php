@@ -200,6 +200,8 @@ class extends Component {
                     First time around here? <flux:link href="{{ route('register') }}" wire:navigate>Sign up for free</flux:link>
                 </flux:subheading>
             @endif--}}
+            <!-- Language Selection Accordion -->
+            <x-einundzwanzig.language-selector/>
         </div>
     </div>
 
