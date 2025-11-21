@@ -3,7 +3,6 @@
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Meetup;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
@@ -14,12 +13,9 @@ new class extends Component {
     #[Validate('image|max:10240')] // 10MB Max
     public $logo;
 
-    public Meetup $meetup;
-
     // Basic Information
     public string $name = '';
     public ?int $city_id = null;
-    public string $slug = '';
     public ?string $intro = null;
 
     // Links and Social Media
@@ -28,19 +24,12 @@ new class extends Component {
     public ?string $twitter_username = null;
     public ?string $matrix_group = null;
     public ?string $nostr = null;
-    public ?string $nostr_status = null;
     public ?string $simplex = null;
     public ?string $signal = null;
 
     // Additional Information
     public ?string $community = null;
-    public ?string $github_data = null;
-    public bool $visible_on_map = false;
-
-    // System fields (read-only)
-    public ?int $created_by = null;
-    public ?string $created_at = null;
-    public ?string $updated_at = null;
+    public bool $visible_on_map = true;
 
     // New City Modal
     public string $newCityName = '';
@@ -72,43 +61,11 @@ new class extends Component {
         \Flux\Flux::modal('add-city')->close();
     }
 
-    public function mount(): void
-    {
-        $this->meetup->load('media');
-
-        // Basic Information
-        $this->name = $this->meetup->name ?? '';
-        $this->city_id = $this->meetup->city_id;
-        $this->slug = $this->meetup->slug ?? '';
-        $this->intro = $this->meetup->intro;
-
-        // Links and Social Media
-        $this->telegram_link = $this->meetup->telegram_link;
-        $this->webpage = $this->meetup->webpage;
-        $this->twitter_username = $this->meetup->twitter_username;
-        $this->matrix_group = $this->meetup->matrix_group;
-        $this->nostr = $this->meetup->nostr;
-        $this->nostr_status = $this->meetup->nostr_status;
-        $this->simplex = $this->meetup->simplex;
-        $this->signal = $this->meetup->signal;
-
-        // Additional Information
-        $this->community = $this->meetup->community;
-        $this->github_data = $this->meetup->github_data ? json_encode($this->meetup->github_data,
-            JSON_PRETTY_PRINT) : null;
-        $this->visible_on_map = (bool) $this->meetup->visible_on_map;
-
-        // System fields
-        $this->created_by = $this->meetup->created_by;
-        $this->created_at = $this->meetup->created_at?->format('Y-m-d H:i:s');
-        $this->updated_at = $this->meetup->updated_at?->format('Y-m-d H:i:s');
-    }
-
-    public function updateMeetup(): void
+    public function createMeetup(): void
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('meetups')->ignore($this->meetup->id)],
-            'city_id' => ['nullable', 'exists:cities,id'],
+            'name' => ['required', 'string', 'max:255', 'unique:meetups,name'],
+            'city_id' => ['required', 'exists:cities,id'],
             'intro' => ['nullable', 'string'],
             'telegram_link' => ['nullable', 'url', 'max:255'],
             'webpage' => ['nullable', 'url', 'max:255'],
@@ -116,37 +73,23 @@ new class extends Component {
             'matrix_group' => ['nullable', 'string', 'max:255'],
             'nostr' => ['nullable', 'string', 'max:255'],
             'simplex' => ['nullable', 'string', 'max:255'],
-            'signal' => ['nullable', 'string', 'max:255'],
+            'signal' => ['nullable', 'string', 'max:510'],
             'community' => ['nullable', 'string', 'max:255'],
+            'visible_on_map' => ['boolean'],
         ]);
 
-        // Convert github_data string back to array if provided
-        if (!empty($validated['github_data'])) {
-            $decoded = json_decode($validated['github_data'], true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $validated['github_data'] = $decoded;
-            } else {
-                $validated['github_data'] = null;
-            }
-        } else {
-            $validated['github_data'] = null;
-        }
-
-        $this->meetup->update($validated);
+        $meetup = Meetup::create($validated);
 
         if ($this->logo) {
-            $this->meetup->clearMediaCollection('logo');
-            $this->meetup
+            $meetup
                 ->addMedia($this->logo->getRealPath())
-                ->usingName($this->meetup->name)
+                ->usingName($meetup->name)
                 ->toMediaCollection('logo');
-            $this->logo = null;
-            $this->meetup->load('media');
         }
 
-        $this->dispatch('meetup-updated', name: $this->meetup->name);
+        session()->flash('status', __('Meetup erfolgreich erstellt!'));
 
-        session()->flash('status', __('Meetup erfolgreich aktualisiert!'));
+        $this->redirect(route_with_country('meetups.edit', ['meetup' => $meetup]), navigate: true);
     }
 
     public function with(): array
@@ -159,9 +102,9 @@ new class extends Component {
 }; ?>
 
 <div class="max-w-4xl mx-auto p-6">
-    <flux:heading size="xl" class="mb-8">{{ __('Meetup bearbeiten') }}: {{ $meetup->name }}</flux:heading>
+    <flux:heading size="xl" class="mb-8">{{ __('Neues Meetup erstellen') }}</flux:heading>
 
-    <form wire:submit="updateMeetup" class="space-y-10">
+    <form wire:submit="createMeetup" class="space-y-10">
 
         <!-- Basic Information -->
         <flux:fieldset class="space-y-6">
@@ -170,22 +113,18 @@ new class extends Component {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 <flux:file-upload wire:model="logo">
-                    <!-- Custom avatar uploader -->
+                    <!-- Custom logo uploader -->
                     <div class="
                             relative flex items-center justify-center size-20 rounded-full transition-colors cursor-pointer
                             border border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/10
                             bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 hover:dark:bg-white/15 in-data-dragging:dark:bg-white/15
                         ">
-                        <!-- Show the uploaded file if it exists -->
-                        @if (!$logo && $meetup->getFirstMedia('logo'))
-                            <img src="{{ $meetup->getFirstMediaUrl('logo') }}" alt="Logo"
-                                 class="size-full object-cover rounded"/>
-                        @elseif($logo)
+                        @if($logo)
                             <img src="{{ $logo?->temporaryUrl() }}" alt="Logo"
                                  class="size-full object-cover rounded-full"/>
                         @else
                             <!-- Show the default icon if no file is uploaded -->
-                            <flux:icon name="user" variant="solid" class="text-zinc-500 dark:text-zinc-400"/>
+                            <flux:icon name="user-group" variant="solid" class="text-zinc-500 dark:text-zinc-400"/>
                         @endif
 
                         <!-- Corner upload icon -->
@@ -196,12 +135,6 @@ new class extends Component {
                 </flux:file-upload>
 
                 <flux:field>
-                    <flux:label>{{ __('ID') }}</flux:label>
-                    <flux:input value="{{ $meetup->id }}" disabled/>
-                    <flux:description>{{ __('System-generierte ID (nur lesbar)') }}</flux:description>
-                </flux:field>
-
-                <flux:field>
                     <flux:label>{{ __('Name') }} <span class="text-red-500">*</span></flux:label>
                     <flux:input wire:model="name" required/>
                     <flux:description>{{ __('Der Anzeigename für dieses Meetup') }}</flux:description>
@@ -210,7 +143,7 @@ new class extends Component {
 
                 <flux:field>
                     <div class="flex items-center justify-between mb-2">
-                        <flux:label>{{ __('Stadt') }}</flux:label>
+                        <flux:label>{{ __('Stadt') }} <span class="text-red-500">*</span></flux:label>
                         <flux:modal.trigger name="add-city">
                             <flux:button class="cursor-pointer" size="xs" variant="ghost" icon="plus">
                                 {{ __('Stadt hinzufügen') }}
@@ -218,7 +151,7 @@ new class extends Component {
                         </flux:modal.trigger>
                     </div>
                     <flux:select variant="listbox" searchable wire:model="city_id"
-                                 placeholder="{{ __('Stadt auswählen') }}">
+                                 placeholder="{{ __('Stadt auswählen') }}" required>
                         <x-slot name="search">
                             <flux:select.search class="px-4" placeholder="{{ __('Suche passende Stadt...') }}"/>
                         </x-slot>
@@ -229,6 +162,12 @@ new class extends Component {
                     </flux:select>
                     <flux:description>{{ __('Die nächstgrößte Stadt oder Ort') }}</flux:description>
                     <flux:error name="city_id"/>
+                </flux:field>
+
+                <flux:field>
+                    <flux:label>{{ __('Auf Karte sichtbar') }}</flux:label>
+                    <flux:switch wire:model="visible_on_map"/>
+                    <flux:description>{{ __('Soll dieses Meetup auf der Karte angezeigt werden?') }}</flux:description>
                 </flux:field>
             </div>
 
@@ -314,36 +253,12 @@ new class extends Component {
                 <flux:field>
                     <flux:label>{{ __('Gemeinschaft') }}</flux:label>
                     <flux:select wire:model="community">
+                        <flux:select.option value="">{{ __('Keine') }}</flux:select.option>
                         <flux:select.option value="einundzwanzig">einundzwanzig</flux:select.option>
                         <flux:select.option value="bitcoin">bitcoin</flux:select.option>
                     </flux:select>
                     <flux:description>{{ __('Gemeinschafts- oder Organisationsname') }}</flux:description>
                     <flux:error name="community"/>
-                </flux:field>
-            </div>
-        </flux:fieldset>
-
-        <!-- System Information -->
-        <flux:fieldset class="space-y-6">
-            <flux:legend>{{ __('Systeminformationen') }}</flux:legend>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <flux:field>
-                    <flux:label>{{ __('Erstellt von') }}</flux:label>
-                    <flux:input value="{{ $meetup->createdBy?->name ?? __('Unbekannt') }}" disabled/>
-                    <flux:description>{{ __('Ersteller des Meetups') }}</flux:description>
-                </flux:field>
-
-                <flux:field>
-                    <flux:label>{{ __('Erstellt am') }}</flux:label>
-                    <flux:input value="{{ $created_at }}" disabled/>
-                    <flux:description>{{ __('Wann dieses Meetup erstellt wurde') }}</flux:description>
-                </flux:field>
-
-                <flux:field>
-                    <flux:label>{{ __('Aktualisiert am') }}</flux:label>
-                    <flux:input value="{{ $updated_at }}" disabled/>
-                    <flux:description>{{ __('Letzte Änderungszeit') }}</flux:description>
                 </flux:field>
             </div>
         </flux:fieldset>
@@ -354,17 +269,9 @@ new class extends Component {
                 {{ __('Abbrechen') }}
             </flux:button>
 
-            <div class="flex items-center gap-4">
-                @if (session('status'))
-                    <flux:text class="text-green-600 dark:text-green-400 font-medium">
-                        {{ session('status') }}
-                    </flux:text>
-                @endif
-
-                <flux:button class="cursor-pointer" variant="primary" type="submit">
-                    {{ __('Meetup aktualisieren') }}
-                </flux:button>
-            </div>
+            <flux:button class="cursor-pointer" variant="primary" type="submit">
+                {{ __('Meetup erstellen') }}
+            </flux:button>
         </div>
     </form>
 

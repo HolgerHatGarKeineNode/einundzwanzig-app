@@ -64,7 +64,7 @@ new class extends Component {
         if ($this->event) {
             $this->event->delete();
             session()->flash('status', __('Event erfolgreich gelöscht!'));
-            $this->redirect(route_with_country('meetups.edit', ['meetup' => $this->meetup]), navigate: true);
+            $this->redirect(route('meetups.landingpage', ['meetup' => $this->meetup, 'country' => $this->country]), navigate: true);
         }
     }
 }; ?>

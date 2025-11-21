@@ -13,20 +13,34 @@ Route::get('stream-calendar', \App\Http\Controllers\DownloadMeetupCalendar::clas
 Route::middleware([])
     ->prefix('/{country:code}')
     ->group(function () {
-
         Volt::route('meetups', 'meetups.index')->name('meetups.index');
         Volt::route('map', 'meetups.map')->name('meetups.map');
         Volt::route('meetup/{meetup:slug}', 'meetups.landingpage')->name('meetups.landingpage');
         Volt::route('meetup/{meetup:slug}/event/{event}', 'meetups.landingpage-event')->name('meetups.landingpage-event');
+
+        Volt::route('courses', 'courses.index')->name('courses.index');
+        Volt::route('course/{course}', 'courses.landingpage')->name('courses.landingpage');
+        Volt::route('course/{course}/event/{event}', 'courses.landingpage-event')->name('courses.landingpage-event');
+
+        Volt::route('lecturers', 'lecturers.index')->name('lecturers.index');
     });
 
 Route::middleware(['auth'])
     ->prefix('/{country:code}')
     ->group(function () {
         Volt::route('dashboard', 'dashboard')->name('dashboard');
+        Volt::route('meetup-create', 'meetups.create')->name('meetups.create');
         Volt::route('meetup-edit/{meetup}', 'meetups.edit')->name('meetups.edit');
         Volt::route('meetup/{meetup}/events/create', 'meetups.create-edit-events')->name('meetups.events.create');
         Volt::route('meetup/{meetup}/events/{event}/edit', 'meetups.create-edit-events')->name('meetups.events.edit');
+
+        Volt::route('course-create', 'courses.create')->name('courses.create');
+        Volt::route('course-edit/{course}', 'courses.edit')->name('courses.edit');
+        Volt::route('course/{course}/events/create', 'courses.create-edit-events')->name('courses.events.create');
+        Volt::route('course/{course}/events/{event}/edit', 'courses.create-edit-events')->name('courses.events.edit');
+
+        Volt::route('lecturer-create', 'lecturers.create')->name('lecturers.create');
+        Volt::route('lecturer-edit/{lecturer}', 'lecturers.edit')->name('lecturers.edit');
     });
 
 Route::middleware(['auth'])

@@ -32,6 +32,21 @@
                                :current="request()->routeIs('meetups.map')"
                                wire:navigate>{{ __('Karte') }}</flux:navlist.item>
         </flux:navlist.group>
+
+        <flux:navlist.group :heading="__('Kurse')" class="grid">
+            <flux:navlist.item icon="academic-cap" :href="route_with_country('courses.index')"
+                               :current="request()->routeIs('courses.index')"
+                               wire:navigate
+                               badge="{{ \App\Models\Course::query()->count() }}">
+                {{ __('Kurse') }}
+            </flux:navlist.item>
+            <flux:navlist.item icon="user" :href="route_with_country('lecturers.index')"
+                               :current="request()->routeIs('lecturers.index')"
+                               wire:navigate
+                               badge="{{ \App\Models\Lecturer::query()->count() }}">
+                {{ __('Dozenten') }}
+            </flux:navlist.item>
+        </flux:navlist.group>
         {{--<flux:navlist.group :heading="__('Wallpaper')" class="grid">
 
         </flux:navlist.group>--}}
