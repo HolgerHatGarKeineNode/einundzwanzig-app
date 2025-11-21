@@ -24,7 +24,10 @@
         <flux:navlist.group :heading="__('Meetups')" class="grid">
             <flux:navlist.item icon="user-group" :href="route_with_country('meetups.index')"
                                :current="request()->routeIs('meetups.index')"
-                               wire:navigate>{{ __('Meetups') }}</flux:navlist.item>
+                               wire:navigate
+                               badge="{{ \App\Models\Meetup::query()->whereHas('city.country', fn($query) => $query->where('countries.code', request()->route('country')))->count() }}">
+                {{ __('Meetups') }}
+            </flux:navlist.item>
             <flux:navlist.item icon="map" :href="route_with_country('meetups.map')"
                                :current="request()->routeIs('meetups.map')"
                                wire:navigate>{{ __('Karte') }}</flux:navlist.item>
@@ -37,7 +40,8 @@
     <flux:spacer/>
 
     <flux:navlist variant="outline">
-        <flux:navlist.item icon="folder-git-2" href="https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app"
+        <flux:navlist.item icon="folder-git-2"
+                           href="https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app"
                            target="_blank">
             {{ __('Repository') }}
         </flux:navlist.item>
