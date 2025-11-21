@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use ParagonIE\CipherSweet\BlindIndex;
+use ParagonIE\CipherSweet\EncryptedRow;
+use ParagonIE\CipherSweet\JsonFieldMap;
+use Spatie\LaravelCipherSweet\Concerns\UsesCipherSweet;
+use Spatie\LaravelCipherSweet\Contracts\CipherSweetEncrypted;
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable implements MustVerifyEmail, CipherSweetEncrypted
+{
+    use UsesCipherSweet;
+    use HasFactory;
+    use Notifiable;
+    use HasRoles;
+
+    protected $guarded = [];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    /**
+     * Get the user's initials
+     */
+    public function initials(): string
+    {
+        return Str::of($this->name)
+            ->explode(' ')
+            ->take(2)
+            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->implode('');
+    }
+
+    public static function configureCipherSweet(EncryptedRow $encryptedRow): void
+    {
+        $map = (new JsonFieldMap())
+            ->addTextField('url')
+            ->addTextField('read_key')
+            ->addTextField('wallet_id');
+
+        $encryptedRow
+            ->addOptionalTextField('public_key')
+            ->addOptionalTextField('lightning_address')
+            ->addOptionalTextField('lnurl')
+            ->addOptionalTextField('node_id')
+            ->addOptionalTextField('email')
+            ->addOptionalTextField('paynym')
+            ->addJsonField('lnbits', $map)
+            ->addBlindIndex('public_key', new BlindIndex('public_key_index'))
+            ->addBlindIndex('lightning_address', new BlindIndex('lightning_address_index'))
+            ->addBlindIndex('lnurl', new BlindIndex('lnurl_index'))
+            ->addBlindIndex('node_id', new BlindIndex('node_id_index'))
+            ->addBlindIndex('paynym', new BlindIndex('paynym_index'))
+            ->addBlindIndex('email', new BlindIndex('email_index'));
+    }
+
+    public function orangePills()
+    {
+        return $this->hasMany(OrangePill::class);
+    }
+
+    public function meetups()
+    {
+        return $this->belongsToMany(Meetup::class);
+    }
+
+    public function reputations()
+    {
+        return $this->morphMany('QCod\Gamify\Reputation', 'subject');
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(Vote::class);
+    }
+
+    public function paidArticles()
+    {
+        return $this->belongsToMany(LibraryItem::class, 'library_item_user', 'user_id', 'library_item_id');
+    }
+}
