@@ -34,9 +34,9 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between flex-col md:flex-row">
         <flux:heading size="xl">{{ __('Kurse') }}</flux:heading>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center flex-col md:flex-row gap-4">
             <div>
                 <flux:input
                     wire:model.live="search"

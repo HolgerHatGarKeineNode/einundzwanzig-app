@@ -40,9 +40,9 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between flex-col md:flex-row mb-6">
         <flux:heading size="xl">{{ __('Meetups') }}</flux:heading>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-col md:flex-row items-center gap-4">
             <flux:button class="cursor-pointer" x-copy-to-clipboard="'{{ route('ics') }}'" icon="calendar-date-range">{{ __('Kalender-Stream-URL kopieren') }}</flux:button>
             <flux:input
                 wire:model.live="search"

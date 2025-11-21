@@ -29,9 +29,9 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between flex-col md:flex-row mb-6">
         <flux:heading size="xl">{{ __('Venues') }}</flux:heading>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center flex-col md:flex-row gap-4">
             <flux:input
                 wire:model.live="search"
                 :placeholder="__('Search venues...')"
