@@ -146,7 +146,9 @@ new class extends Component {
                     </flux:table.cell>
 
                     <flux:table.cell>
-                        <flux:button :href="route_with_country('meetups.edit', ['meetup' => $meetup])" size="xs"
+                        <flux:button
+                            :disabled="!$meetup->belongsToMe"
+                            :href="$meetup->belongsToMe ? route_with_country('meetups.edit', ['meetup' => $meetup]) : null" size="xs"
                                      variant="filled" icon="pencil">
                             {{ __('Bearbeiten') }}
                         </flux:button>

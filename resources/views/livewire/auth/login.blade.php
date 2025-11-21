@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 use Flux\Flux;
@@ -22,18 +23,16 @@ class extends Component {
 
     public bool $remember = false;
 
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function login(): void
+    #[On('nostrLoggedIn')]
+    public function loginListener($pubkey): void
     {
-        if (app()->environment('production')) {
-            Flux::toast(text: 'Login work in progress', variant: 'danger');
+        $user = \App\Models\User::query()->where('nostr', $pubkey)->first();
+        if ($user) {
+            Auth::loginUsingId($user->id);
+            Session::regenerate();
+            $this->redirectIntended(default: route_with_country('dashboard', absolute: false), navigate: true);
             return;
         }
-        Auth::loginUsingId(1, true);
-        Session::regenerate();
-        $this->redirectIntended(default: route_with_country('dashboard', absolute: false), navigate: true);
         return;
 
         $this->validate();
@@ -84,14 +83,15 @@ class extends Component {
     }
 }; ?>
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen" x-data="nostrLogin">
     <div class="flex-1 flex justify-center items-center">
         <div class="w-80 max-w-80 space-y-6">
             <!-- Logo -->
             <div class="flex justify-center">
                 <a href="/" class="group flex items-center gap-3">
                     <div>
-                        <flux:avatar class="[:where(&)]:size-32 [:where(&)]:text-base" size="xl" src="{{ asset('img/einundzwanzig-square.svg') }}" />
+                        <flux:avatar class="[:where(&)]:size-32 [:where(&)]:text-base" size="xl"
+                                     src="{{ asset('img/einundzwanzig-square.svg') }}"/>
                     </div>
                 </a>
             </div>
@@ -134,10 +134,10 @@ class extends Component {
             {{--<flux:separator text="or" />--}}
 
             <!-- Session Status -->
-            <x-auth-session-status class="text-center" :status="session('status')" />
+            <x-auth-session-status class="text-center" :status="session('status')"/>
 
             <!-- Login Form -->
-            <form wire:submit="login" class="flex flex-col gap-6">
+            <div  class="flex flex-col gap-6">
                 <!-- Email Input -->
                 {{--<flux:input
                     wire:model="email"
@@ -172,8 +172,8 @@ class extends Component {
                 {{--<flux:checkbox wire:model="remember" label="Remember me for 30 days" />--}}
 
                 <!-- Submit Button -->
-                <flux:button variant="primary" type="submit" class="w-full">Log in</flux:button>
-            </form>
+                <flux:button class="cursor-pointer" variant="primary" @click="openNostrLogin" class="w-full">{{ __('Log in mit Nostr') }}</flux:button>
+            </div>
 
             <!-- Sign up Link -->
             {{--@if (Route::has('register'))
@@ -186,7 +186,8 @@ class extends Component {
 
     <!-- Right Side Panel -->
     <div class="flex-1 p-4 max-lg:hidden">
-        <div class="text-white relative rounded-lg h-full w-full bg-zinc-900 flex flex-col items-start justify-end p-16" style="background-image: url('https://dergigi.com/assets/images/bitcoin-is-time.jpg'); background-size: cover">
+        <div class="text-white relative rounded-lg h-full w-full bg-zinc-900 flex flex-col items-start justify-end p-16"
+             style="background-image: url('https://dergigi.com/assets/images/bitcoin-is-time.jpg'); background-size: cover">
 
             <!-- Testimonial -->
             <div class="mb-6 italic font-base text-3xl xl:text-4xl">
@@ -195,7 +196,7 @@ class extends Component {
 
             <!-- Author Info -->
             <div class="flex gap-4">
-                <flux:avatar src="https://dergigi.com/assets/images/avatar.jpg" size="xl" />
+                <flux:avatar src="https://dergigi.com/assets/images/avatar.jpg" size="xl"/>
                 <div class="flex flex-col justify-center font-medium">
                     <div class="text-lg">Gigi</div>
                     <div class="text-zinc-300">bitcoiner and software engineer</div>

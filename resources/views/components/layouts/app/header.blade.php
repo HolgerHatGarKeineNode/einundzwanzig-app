@@ -155,5 +155,7 @@
     });
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/window.nostr.js/dist/window.nostr.min.js"></script>
+
 </body>
 </html>

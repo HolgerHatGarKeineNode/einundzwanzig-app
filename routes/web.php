@@ -10,10 +10,6 @@ Volt::route('welcome', 'welcome')->name('welcome');
 Route::middleware([])
     ->prefix('/{country:code}')
     ->group(function () {
-        Route::view('dashboard', 'dashboard')
-            ->middleware(['auth', 'verified'])
-            ->name('dashboard');
-
         Volt::route('meetups', 'meetups.index')->name('meetups.index');
         Volt::route('map', 'meetups.map')->name('meetups.map');
         Volt::route('meetup/{meetup:slug}', 'meetups.landingpage')->name('meetups.landingpage');
@@ -23,6 +19,7 @@ Route::middleware([])
 Route::middleware(['auth'])
     ->prefix('/{country:code}')
     ->group(function () {
+        Volt::route('dashboard', 'dashboard')->name('dashboard');
         Volt::route('meetup-edit/{meetup}', 'meetups.edit')->name('meetups.edit');
     });
 

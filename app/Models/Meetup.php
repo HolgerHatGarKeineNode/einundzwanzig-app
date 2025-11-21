@@ -63,7 +63,8 @@ class Meetup extends Model implements HasMedia
             ->addMediaConversion('preview')
             ->fit(Fit::Crop, 300, 300)
             ->nonQueued();
-        $this->addMediaConversion('thumb')
+        $this
+            ->addMediaConversion('thumb')
             ->fit(Fit::Crop, 130, 130)
             ->width(130)
             ->height(130);
@@ -71,7 +72,8 @@ class Meetup extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('logo')
+        $this
+            ->addMediaCollection('logo')
             ->singleFile()
             ->useFallbackUrl(asset('img/einundzwanzig.png'));
     }
@@ -101,7 +103,8 @@ class Meetup extends Model implements HasMedia
         }
 
         return Attribute::make(
-            get: fn() => url()->route('img',
+            get: fn()
+                => url()->route('img',
                 [
                     'path' => $path,
                     'w' => 900,
@@ -117,9 +120,11 @@ class Meetup extends Model implements HasMedia
         $nextEvent = $this->meetupEvents()->where('start', '>=', now())->orderBy('start')->first();
 
         return Attribute::make(
-            get: fn() => $nextEvent ? [
+            get: fn()
+                => $nextEvent ? [
                 'start' => $nextEvent->start,
-                'portalLink' => url()->route('meetups.landingpage-event', ['country' => $this->city->country, 'meetup' => $this, 'event' => $nextEvent]),
+                'portalLink' => url()->route('meetups.landingpage-event',
+                    ['country' => $this->city->country, 'meetup' => $this, 'event' => $nextEvent]),
                 'location' => $nextEvent->location,
                 'description' => $nextEvent->description,
                 'link' => $nextEvent->link,
@@ -127,6 +132,13 @@ class Meetup extends Model implements HasMedia
                 'might_attendees' => count($nextEvent->might_attendees ?? []),
                 'nostr_note' => str($nextEvent->nostr_status)->after('Sent event ')->before(' to '),
             ] : null,
+        );
+    }
+
+    protected function belongsToMe(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => false,
         );
     }
 
