@@ -4,7 +4,7 @@ Hosted: [https://portal.einundzwanzig.space](https://portal.einundzwanzig.space)
 
 ## Contributing and Proposals
 
-[https://gittr.space](https://gittr.space/npub1pt0kw36ue3w2g4haxq3wgm6a2fhtptmzsjlc2j2vphtcgle72qesgpjyc6/einundzwanzig-app?file=README.md)
+[https://gitworkshop.dev](https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app)
 
 ## Development
 
@@ -48,7 +48,7 @@ docker run --rm \
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within this project, please go to [https://gittr.space](https://gittr.space/npub1pt0kw36ue3w2g4haxq3wgm6a2fhtptmzsjlc2j2vphtcgle72qesgpjyc6/einundzwanzig-app?file=README.md). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within this project, please go to [https://gitworkshop.dev](https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app). All security vulnerabilities will be promptly addressed.
 
 ## License
 
