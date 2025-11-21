@@ -70,7 +70,9 @@ new class extends Component {
             @foreach ($meetups as $meetup)
                 <flux:table.row :key="$meetup->id">
                     <flux:table.cell variant="strong" class="flex items-center gap-3">
-                            <flux:avatar :href="route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country])" src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
+                            <flux:avatar
+                                class="[:where(&)]:size-24 [:where(&)]:text-base" size="xl"
+                                :href="route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country])" src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
                         <div>
                             @if($meetup->city)
                                 <a href="{{ route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country]) }}">
@@ -145,15 +147,21 @@ new class extends Component {
                     </flux:table.cell>
 
                     <flux:table.cell>
-                        <flux:button
-                            :disabled="!$meetup->belongsToMe"
-                            :href="$meetup->belongsToMe ? route_with_country('meetups.edit', ['meetup' => $meetup]) : null" size="xs"
-                                     variant="filled" icon="pencil">
-                            {{ __('Bearbeiten') }}
-                        </flux:button>
-                        <flux:button :href="route_with_country('meetups.events.create', ['meetup' => $meetup])" size="xs" variant="filled" icon="calendar">
-                            {{ __('Neues Event erstellen') }}
-                        </flux:button>
+                        <div class="flex flex-col space-y-2">
+                            <div>
+                                <flux:button
+                                    :disabled="!$meetup->belongsToMe"
+                                    :href="$meetup->belongsToMe ? route_with_country('meetups.edit', ['meetup' => $meetup]) : null" size="xs"
+                                    variant="filled" icon="pencil">
+                                    {{ __('Bearbeiten') }}
+                                </flux:button>
+                            </div>
+                            <div>
+                                <flux:button :href="route_with_country('meetups.events.create', ['meetup' => $meetup])" size="xs" variant="filled" icon="calendar">
+                                    {{ __('Neues Event erstellen') }}
+                                </flux:button>
+                            </div>
+                        </div>
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach

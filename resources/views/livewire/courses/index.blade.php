@@ -64,19 +64,23 @@ new class extends Component {
         <flux:table.rows>
             @foreach ($courses as $course)
                 <flux:table.row :key="$course->id">
-                    <flux:table.cell variant="strong" class="flex items-center gap-3">
-                        <flux:avatar :href="route('courses.landingpage', ['course' => $course, 'country' => $country])"
-                                     src="{{ $course->getFirstMedia('logo') ? $course->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
-                        <div>
-                            <a href="{{ route('courses.landingpage', ['course' => $course, 'country' => $country]) }}">
-                                <span>{{ $course->name }}</span>
-                                @if($course->description)
-                                    <div class="text-xs text-zinc-500">
-                                        {{ Str::limit($course->description, 60) }}
-                                    </div>
-                                @endif
-                            </a>
-                        </div>
+                    <flux:table.cell variant="strong">
+                        <flux:tooltip content="{{ $course->name }}">
+                            <div class="flex items-center gap-3">
+                                <flux:avatar :href="route('courses.landingpage', ['course' => $course, 'country' => $country])"
+                                             src="{{ $course->getFirstMedia('logo') ? $course->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
+                                <div>
+                                    <a href="{{ route('courses.landingpage', ['course' => $course, 'country' => $country]) }}">
+                                        <span>{{ Str::limit($course->name, 30) }}</span>
+                                        @if($course->description)
+                                            <div class="text-xs text-zinc-500">
+                                                {{ Str::limit($course->description, 60) }}
+                                            </div>
+                                        @endif
+                                    </a>
+                                </div>
+                            </div>
+                        </flux:tooltip>
                     </flux:table.cell>
 
                     <flux:table.cell>
@@ -104,22 +108,28 @@ new class extends Component {
                     </flux:table.cell>
 
                     <flux:table.cell>
-                        <flux:button
-                            :disabled="$course->created_by !== auth()->id()"
-                            :href="$course->created_by === auth()->id() ? route_with_country('courses.edit', ['course' => $course]) : null"
-                            size="xs"
-                            variant="filled"
-                            icon="pencil">
-                            {{ __('Bearbeiten') }}
-                        </flux:button>
-                        <flux:button
-                            :disabled="$course->created_by !== auth()->id()"
-                            :href="$course->created_by === auth()->id() ? route_with_country('courses.events.create', ['course' => $course]) : null"
-                            size="xs"
-                            variant="filled"
-                            icon="calendar">
-                            {{ __('Neues Event erstellen') }}
-                        </flux:button>
+                        <div class="flex flex-col space-y-2">
+                            <div>
+                                <flux:button
+                                    :disabled="$course->created_by !== auth()->id()"
+                                    :href="$course->created_by === auth()->id() ? route_with_country('courses.edit', ['course' => $course]) : null"
+                                    size="xs"
+                                    variant="filled"
+                                    icon="pencil">
+                                    {{ __('Bearbeiten') }}
+                                </flux:button>
+                            </div>
+                            <div>
+                                <flux:button
+                                    :disabled="$course->created_by !== auth()->id()"
+                                    :href="$course->created_by === auth()->id() ? route_with_country('courses.events.create', ['course' => $course]) : null"
+                                    size="xs"
+                                    variant="filled"
+                                    icon="calendar">
+                                    {{ __('Neues Event erstellen') }}
+                                </flux:button>
+                            </div>
+                        </div>
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach

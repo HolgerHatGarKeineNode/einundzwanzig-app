@@ -75,13 +75,13 @@ new class extends Component {
                     </flux:table.cell>
                     <flux:table.cell>
                         @if($city->createdBy)
-                            {{ $city->createdBy->name }}
+                            {{ Str::limit($city->createdBy->name, 30) }}
                         @endif
                     </flux:table.cell>
                     <flux:table.cell>
                         <div class="flex gap-2">
                             @auth
-                                <flux:button size="sm" :href="route('cities.edit',['city' => $city, 'country' => $country])" icon="pencil">
+                                <flux:button size="xs" :href="route('cities.edit',['city' => $city, 'country' => $country])" icon="pencil">
                                     {{ __('Edit') }}
                                 </flux:button>
                             @endauth
