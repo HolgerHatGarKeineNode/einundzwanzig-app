@@ -8,8 +8,6 @@ new class extends Component {
     use WithPagination;
 
     public $country = 'de';
-    public $sortBy = 'name';
-    public $sortDirection = 'asc';
     public $search = '';
 
     public function mount(): void
@@ -17,31 +15,25 @@ new class extends Component {
         $this->country = request()->route('country');
     }
 
-    public function sort($column)
-    {
-        if ($this->sortBy === $column) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortBy = $column;
-            $this->sortDirection = 'asc';
-        }
-    }
-
     public function with(): array
     {
         return [
             'meetups' => Meetup::with(['city.country', 'createdBy'])
+                ->withExists([
+                    'meetupEvents as has_future_events' => fn($query) => $query->where('start', '>=', now())
+                ])
+                ->leftJoin('meetup_events', function ($join) {
+                    $join->on('meetups.id', '=', 'meetup_events.meetup_id')
+                        ->where('meetup_events.start', '>=', now());
+                })
+                ->selectRaw('meetups.*, MIN(meetup_events.start) as next_event_start')
+                ->groupBy('meetups.id')
                 ->whereHas('city.country', fn($query) => $query->where('countries.code', $this->country))
                 ->when($this->search, fn($query)
-                    => $query->where('name', 'ilike', '%'.$this->search.'%'),
+                    => $query->where('meetups.name', 'ilike', '%'.$this->search.'%'),
                 )
-                ->when($this->sortBy === 'city',
-                    fn($query)
-                        => $query
-                        ->orderBy('cities.name', $this->sortDirection)
-                        ->join('cities', 'meetups.city_id', '=', 'cities.id'),
-                    fn($query) => $query->orderBy($this->sortBy, $this->sortDirection),
-                )
+                ->orderByDesc('has_future_events')
+                ->orderByRaw('next_event_start ASC NULLS LAST')
                 ->paginate(15),
         ];
     }
@@ -67,8 +59,7 @@ new class extends Component {
 
     <flux:table :paginate="$meetups" class="mt-6">
         <flux:table.columns>
-            <flux:table.column sortable :sorted="$sortBy === 'name'" :direction="$sortDirection"
-                               wire:click="sort('name')">{{ __('Name') }}
+            <flux:table.column>{{ __('Name') }}
             </flux:table.column>
             <flux:table.column>{{ __('Nächster Termin') }}</flux:table.column>
             <flux:table.column>{{ __('Links') }}</flux:table.column>

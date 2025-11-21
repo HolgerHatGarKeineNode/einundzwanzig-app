@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\City;
 use App\Models\Course;
 use App\Models\CourseEvent;
 use App\Models\Venue;
@@ -23,6 +24,11 @@ new class extends Component {
 
     #[Validate('required|url|max:255')]
     public ?string $link = null;
+
+    // New Venue Modal
+    public string $newVenueName = '';
+    public ?int $newVenueCityId = null;
+    public string $newVenueStreet = '';
 
     public function mount(): void
     {
@@ -69,10 +75,33 @@ new class extends Component {
         }
     }
 
+    public function createVenue(): void
+    {
+        $validated = $this->validate([
+            'newVenueName' => ['required', 'string', 'max:255', 'unique:venues,name'],
+            'newVenueCityId' => ['required', 'exists:cities,id'],
+            'newVenueStreet' => ['required', 'string', 'max:255'],
+        ]);
+
+        $venue = Venue::create([
+            'name' => $validated['newVenueName'],
+            'city_id' => $validated['newVenueCityId'],
+            'street' => $validated['newVenueStreet'],
+            'slug' => str($validated['newVenueName'])->slug(),
+            'created_by' => auth()->id(),
+        ]);
+
+        $this->venue_id = $venue->id;
+        $this->reset(['newVenueName', 'newVenueCityId', 'newVenueStreet']);
+
+        \Flux\Flux::modal('add-venue')->close();
+    }
+
     public function with(): array
     {
         return [
             'venues' => Venue::query()->orderBy('name')->get(),
+            'cities' => City::query()->orderBy('name')->get(),
         ];
     }
 }; ?>
@@ -105,7 +134,14 @@ new class extends Component {
             </div>
 
             <flux:field>
-                <flux:label>{{ __('Veranstaltungsort') }} <span class="text-red-500">*</span></flux:label>
+                <div class="flex items-center justify-between mb-2">
+                    <flux:label>{{ __('Veranstaltungsort') }} <span class="text-red-500">*</span></flux:label>
+                    <flux:modal.trigger name="add-venue">
+                        <flux:button class="cursor-pointer" size="xs" variant="ghost" icon="plus">
+                            {{ __('Ort hinzufügen') }}
+                        </flux:button>
+                    </flux:modal.trigger>
+                </div>
                 <flux:select variant="listbox" searchable wire:model="venue_id"
                              placeholder="{{ __('Veranstaltungsort auswählen') }}" required>
                     <x-slot name="search">
@@ -159,4 +195,51 @@ new class extends Component {
             </div>
         </div>
     </form>
+
+    <!-- Add Venue Modal -->
+    <flux:modal name="add-venue" variant="flyout" wire:key="add-venue-modal">
+        <form wire:submit="createVenue" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('Veranstaltungsort hinzufügen') }}</flux:heading>
+                <flux:text class="mt-2">{{ __('Füge einen neuen Veranstaltungsort zur Datenbank hinzu.') }}</flux:text>
+            </div>
+
+            <flux:field>
+                <flux:label>{{ __('Name') }} <span class="text-red-500">*</span></flux:label>
+                <flux:input wire:model="newVenueName" placeholder="{{ __('z.B. Bitcoin Zentrum München') }}" required/>
+                <flux:error name="newVenueName"/>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>{{ __('Stadt') }} <span class="text-red-500">*</span></flux:label>
+                <flux:select variant="listbox" searchable wire:model="newVenueCityId"
+                             placeholder="{{ __('Stadt auswählen') }}">
+                    <x-slot name="search">
+                        <flux:select.search class="px-4" placeholder="{{ __('Suche passende Stadt...') }}"/>
+                    </x-slot>
+                    @foreach($cities as $city)
+                        <flux:select.option value="{{ $city->id }}">{{ $city->name }} ({{ $city->country->name }})
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:error name="newVenueCityId"/>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>{{ __('Straße') }} <span class="text-red-500">*</span></flux:label>
+                <flux:input wire:model="newVenueStreet" placeholder="{{ __('z.B. Hauptstraße 1') }}" required/>
+                <flux:error name="newVenueStreet"/>
+            </flux:field>
+
+            <div class="flex gap-2">
+                <flux:spacer/>
+
+                <flux:modal.close>
+                    <flux:button class="cursor-pointer" type="button" variant="ghost">{{ __('Abbrechen') }}</flux:button>
+                </flux:modal.close>
+
+                <flux:button class="cursor-pointer" type="submit" variant="primary">{{ __('Ort erstellen') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>

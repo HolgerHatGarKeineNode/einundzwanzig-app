@@ -20,6 +20,7 @@ new class extends Component {
             'course' => $this->course->load('lecturer'),
             'events' => $this->course
                 ->courseEvents()
+                ->with(['venue.city'])
                 ->where('from', '>=', now())
                 ->orderBy('from', 'asc')
                 ->get(),
@@ -133,7 +134,21 @@ new class extends Component {
                                 <flux:icon.map-pin class="inline w-4 h-4"/>
                                 {{ $event->venue->name }}
                             </flux:text>
+                            @if($event->venue->street)
+                                <flux:text class="text-xs text-zinc-500 dark:text-zinc-500 ml-5">
+                                    {{ $event->venue->street }}
+                                    @if($event->venue->city)
+                                        , {{ $event->venue->city->name }}
+                                    @endif
+                                </flux:text>
+                            @endif
                         @endif
+
+                        <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                            <div class="text-xs text-zinc-500 flex items-center gap-2">
+                                <span>{{ $event->registrations->count() }} {{ __('Anmeldungen') }}</span>
+                            </div>
+                        </flux:text>
 
                         <div class="mt-auto pt-4 flex gap-2">
                             <flux:button
