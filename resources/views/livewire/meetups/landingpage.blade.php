@@ -193,7 +193,7 @@ new class extends Component {
         <div class="mt-16">
             <div class="flex items-center space-x-4 mb-6">
                 <flux:heading size="xl">{{ __('Kommende Veranstaltungen') }}</flux:heading>
-                @if(auth()->user()->meetups()->find($meetup->id)?->exists)
+                @if(auth()->user() && auth()->user()->meetups()->find($meetup->id)?->exists)
                     <flux:button :href="route_with_country('meetups.events.create', ['meetup' => $meetup])" variant="primary" icon="calendar">
                         {{ __('Neues Event erstellen') }}
                     </flux:button>
@@ -259,7 +259,7 @@ new class extends Component {
     @else
         <div class="mt-16">
             <div class="flex items-center space-x-4 mb-6">
-                @if(auth()->user()->meetups()->find($meetup->id)?->exists)
+                @if(auth()->user() && auth()->user()->meetups()->find($meetup->id)?->exists)
                     <flux:button :href="route_with_country('meetups.events.create', ['meetup' => $meetup])" variant="primary" icon="calendar">
                         {{ __('Neues Event erstellen') }}
                     </flux:button>

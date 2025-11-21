@@ -104,13 +104,13 @@
                             <flux:avatar :src="auth()->user()->profile_photo_url" size="sm" class="shrink-0" />
 
                             <div class="grid flex-1 text-start text-sm leading-tight">
-                                <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
+                                <span class="truncate font-semibold">{{ auth()->user()?->name }}</span>
                                 <span class="truncate text-xs">
-                                        @if(strlen(auth()->user()->name) > 12)
-                                        {{ Str::substr(auth()->user()->name, 0, 4) }}
-                                        ...{{ Str::substr(auth()->user()->name, -4) }}
+                                        @if(strlen(auth()->user()?->name) > 12)
+                                        {{ Str::substr(auth()->user()?->name, 0, 4) }}
+                                        ...{{ Str::substr(auth()->user()?->name, -4) }}
                                     @else
-                                        {{ auth()->user()->name }}
+                                        {{ auth()->user()?->name }}
                                     @endif
                                     </span>
                             </div>
@@ -165,13 +165,13 @@
                             <flux:avatar :src="auth()->user()->profile_photo_url" size="sm" class="shrink-0" />
 
                             <div class="grid flex-1 text-start text-sm leading-tight">
-                                <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
+                                <span class="truncate font-semibold">{{ auth()->user()?->name }}</span>
                                 <span class="truncate text-xs">
-                                        @if(strlen(auth()->user()->name) > 12)
-                                        {{ Str::substr(auth()->user()->name, 0, 4) }}
-                                        ...{{ Str::substr(auth()->user()->name, -4) }}
+                                        @if(strlen(auth()->user()?->name) > 12)
+                                        {{ Str::substr(auth()->user()?->name, 0, 4) }}
+                                        ...{{ Str::substr(auth()->user()?->name, -4) }}
                                     @else
-                                        {{ auth()->user()->name }}
+                                        {{ auth()->user()?->name }}
                                     @endif
                                     </span>
                             </div>
