@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\City;
+use App\Models\Country;
 use App\Models\Meetup;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
@@ -40,6 +41,36 @@ new class extends Component {
     public ?int $created_by = null;
     public ?string $created_at = null;
     public ?string $updated_at = null;
+
+    // New City Modal
+    public string $newCityName = '';
+    public ?int $newCityCountryId = null;
+    public float $newCityLatitude = 0;
+    public float $newCityLongitude = 0;
+
+    public function createCity(): void
+    {
+        $validated = $this->validate([
+            'newCityName' => ['required', 'string', 'max:255', 'unique:cities,name'],
+            'newCityCountryId' => ['required', 'exists:countries,id'],
+            'newCityLatitude' => ['required', 'numeric'],
+            'newCityLongitude' => ['required', 'numeric'],
+        ]);
+
+        $city = City::create([
+            'name' => $validated['newCityName'],
+            'country_id' => $validated['newCityCountryId'],
+            'latitude' => $validated['newCityLatitude'],
+            'longitude' => $validated['newCityLongitude'],
+            'slug' => str($validated['newCityName'])->slug(),
+            'created_by' => auth()->id(),
+        ]);
+
+        $this->city_id = $city->id;
+        $this->reset(['newCityName', 'newCityCountryId', 'newCityLatitude', 'newCityLongitude']);
+
+        \Flux\Flux::modal('add-city')->close();
+    }
 
     public function mount(): void
     {
@@ -121,7 +152,8 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'cities' => City::orderBy('name')->get(),
+            'cities' => City::query()->orderBy('name')->get(),
+            'countries' => Country::query()->orderBy('countries.name')->get(),
         ];
     }
 }; ?>
@@ -146,9 +178,11 @@ new class extends Component {
                         ">
                         <!-- Show the uploaded file if it exists -->
                         @if (!$logo && $meetup->getFirstMedia('logo'))
-                            <img src="{{ $meetup->getFirstMediaUrl('logo') }}" alt="Logo" class="size-full object-cover rounded"/>
+                            <img src="{{ $meetup->getFirstMediaUrl('logo') }}" alt="Logo"
+                                 class="size-full object-cover rounded"/>
                         @elseif($logo)
-                            <img src="{{ $logo?->temporaryUrl() }}" alt="Logo" class="size-full object-cover rounded-full" />
+                            <img src="{{ $logo?->temporaryUrl() }}" alt="Logo"
+                                 class="size-full object-cover rounded-full"/>
                         @else
                             <!-- Show the default icon if no file is uploaded -->
                             <flux:icon name="user" variant="solid" class="text-zinc-500 dark:text-zinc-400"/>
@@ -175,14 +209,22 @@ new class extends Component {
                 </flux:field>
 
                 <flux:field>
-                    <flux:label>{{ __('Stadt') }}</flux:label>
+                    <div class="flex items-center justify-between mb-2">
+                        <flux:label>{{ __('Stadt') }}</flux:label>
+                        <flux:modal.trigger name="add-city">
+                            <flux:button size="xs" variant="ghost" icon="plus">
+                                {{ __('Stadt hinzufügen') }}
+                            </flux:button>
+                        </flux:modal.trigger>
+                    </div>
                     <flux:select variant="listbox" searchable wire:model="city_id"
                                  placeholder="{{ __('Stadt auswählen') }}">
                         <x-slot name="search">
                             <flux:select.search class="px-4" placeholder="{{ __('Suche passende Stadt...') }}"/>
                         </x-slot>
                         @foreach($cities as $city)
-                            <flux:select.option value="{{ $city->id }}">{{ $city->name }}</flux:select.option>
+                            <flux:select.option value="{{ $city->id }}">{{ $city->name }} ({{ $city->country->name }})
+                            </flux:select.option>
                         @endforeach
                     </flux:select>
                     <flux:description>{{ __('Die nächstgrößte Stadt oder Ort') }}</flux:description>
@@ -325,4 +367,64 @@ new class extends Component {
             </div>
         </div>
     </form>
+
+    <!-- Add City Modal -->
+    <flux:modal name="add-city" variant="flyout" wire:key="add-city-modal">
+        <form wire:submit="createCity" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('Stadt hinzufügen') }}</flux:heading>
+                <flux:text class="mt-2">{{ __('Füge eine neue Stadt zur Datenbank hinzu.') }}</flux:text>
+            </div>
+
+            <flux:field>
+                <flux:label>{{ __('Stadtname') }} <span class="text-red-500">*</span></flux:label>
+                <flux:input wire:model="newCityName" placeholder="{{ __('z.B. Berlin') }}" required/>
+                <flux:error name="newCityName"/>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>{{ __('Land') }} <span class="text-red-500">*</span></flux:label>
+                <flux:select variant="listbox" searchable wire:model="newCityCountryId"
+                             placeholder="{{ __('Land auswählen') }}">
+                    @foreach($countries as $country)
+                        <flux:select.option value="{{ $country->id }}">
+                            <div class="flex items-center space-x-2">
+                                <img alt="{{ str($country->code)->lower() }}"
+                                     src="{{ asset('vendor/blade-flags/country-'.str($country->code)->lower().'.svg') }}"
+                                     width="24" height="12"/>
+                                <span>{{ $country->name }}</span>
+                            </div>
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:error name="newCityCountryId"/>
+            </flux:field>
+
+            <div class="grid grid-cols-2 gap-4">
+                <flux:field>
+                    <flux:label>{{ __('Breitengrad') }} <span class="text-red-500">*</span></flux:label>
+                    <flux:input wire:model="newCityLatitude" type="number" step="0.000001" placeholder="52.520008"
+                                required/>
+                    <flux:error name="newCityLatitude"/>
+                </flux:field>
+
+                <flux:field>
+                    <flux:label>{{ __('Längengrad') }} <span class="text-red-500">*</span></flux:label>
+                    <flux:input wire:model="newCityLongitude" type="number" step="0.000001" placeholder="13.404954"
+                                required/>
+                    <flux:error name="newCityLongitude"/>
+                </flux:field>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer/>
+
+                <flux:modal.close>
+                    <flux:button type="button" variant="ghost">{{ __('Abbrechen') }}</flux:button>
+                </flux:modal.close>
+
+                <flux:button type="submit" variant="primary">{{ __('Stadt erstellen') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>
