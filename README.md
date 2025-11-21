@@ -4,7 +4,7 @@ Demo: [https://portal.codingarena.top/welcome](https://portal.codingarena.top/we
 
 ## Contributing and Proposals
 
-[https://budabit.club](https://budabit.club/spaces/budabit.nostr1.com/git/naddr1qvzqqqrhnypzqzklvar4enzu53t06vpzu3h465nwkzhk9p9ls4y5crwhs3lnu5pnqqgk26tww4hxg7nhv9h856t894shquqltl96k/patches)
+[https://gitworkshop.dev](https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app)
 
 ## Development
 
@@ -48,7 +48,7 @@ docker run --rm \
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within this project, please go to [https://budabit.club](https://budabit.club/spaces/budabit.nostr1.com/git/naddr1qvzqqqrhnypzqzklvar4enzu53t06vpzu3h465nwkzhk9p9ls4y5crwhs3lnu5pnqq2x26tww4hxg7nhv9h856t894cx7un5v9kqxpnrpc/issues/8457d40013ea6de44b5e9435e1ceec2687883f2b21165bb1c54374c0cc79a383). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within this project, please go to [https://gitworkshop.dev](https://gitworkshop.dev/holgerhatgarkeinenode@einundzwanzig.space/einundzwanzig-app). All security vulnerabilities will be promptly addressed.
 
 ## License
 
