@@ -21,6 +21,8 @@ Route::middleware(['auth'])
     ->group(function () {
         Volt::route('dashboard', 'dashboard')->name('dashboard');
         Volt::route('meetup-edit/{meetup}', 'meetups.edit')->name('meetups.edit');
+        Volt::route('meetup/{meetup}/events/create', 'meetups.create-edit-events')->name('meetups.events.create');
+        Volt::route('meetup/{meetup}/events/{event}/edit', 'meetups.create-edit-events')->name('meetups.events.edit');
     });
 
 Route::middleware(['auth'])

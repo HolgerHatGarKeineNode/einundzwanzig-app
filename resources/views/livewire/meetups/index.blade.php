@@ -152,6 +152,9 @@ new class extends Component {
                                      variant="filled" icon="pencil">
                             {{ __('Bearbeiten') }}
                         </flux:button>
+                        <flux:button :href="route_with_country('meetups.events.create', ['meetup' => $meetup])" size="xs" variant="ghost" icon="calendar">
+                            {{ __('Events') }}
+                        </flux:button>
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach

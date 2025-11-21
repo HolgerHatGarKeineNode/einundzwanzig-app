@@ -194,39 +194,56 @@ new class extends Component {
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($events as $event)
-                    <a href="{{ route('meetups.landingpage-event', ['meetup' => $meetup->slug, 'event' => $event->id, 'country' => $country]) }}"
-                       aria-label="{{ $event->description ?? 'Event details' }}">
-                        <flux:card size="sm" class="hover:bg-zinc-50 dark:hover:bg-zinc-700 h-full">
-                            <flux:heading class="flex items-center gap-2">
-                                {{ $event->start->format('d.m.Y') }}
-                                <flux:icon name="arrow-up-right" class="ml-auto text-zinc-400" variant="micro"/>
-                            </flux:heading>
+                    <flux:card size="sm" class="h-full flex flex-col">
+                        <flux:heading class="flex items-center gap-2">
+                            {{ $event->start->format('d.m.Y') }}
+                        </flux:heading>
 
-                            <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                                <flux:icon.clock class="inline w-4 h-4"/>
-                                {{ $event->start->format('H:i') }} Uhr
+                        <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                            <flux:icon.clock class="inline w-4 h-4"/>
+                            {{ $event->start->format('H:i') }} Uhr
+                        </flux:text>
+
+                        @if($event->location)
+                            <flux:text class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                                <flux:icon.map-pin class="inline w-4 h-4"/>
+                                {{ $event->location }}
                             </flux:text>
+                        @endif
 
-                            @if($event->location)
-                                <flux:text class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                                    <flux:icon.map-pin class="inline w-4 h-4"/>
-                                    {{ $event->location }}
-                                </flux:text>
+                        @if($event->description)
+                            <flux:text class="mt-2">{{ Str::limit($event->description, 100) }}</flux:text>
+                        @endif
+
+                        <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                            <div class="text-xs text-zinc-500 flex items-center gap-2">
+                                <span>{{ count($event->attendees ?? []) }} Zusagen</span>
+                                <flux:separator vertical/>
+                                <span>{{ count($event->might_attendees ?? []) }} Vielleicht</span>
+                            </div>
+                        </flux:text>
+
+                        <div class="mt-auto pt-4 flex gap-2">
+                            <flux:button
+                                :href="route('meetups.landingpage-event', ['meetup' => $meetup->slug, 'event' => $event->id, 'country' => $country])"
+                                size="xs"
+                                variant="primary"
+                                class="flex-1"
+                            >
+                                {{ __('Öffnen/RSVP') }}
+                            </flux:button>
+                            @if($meetup->belongsToMe)
+                                <flux:button
+                                    :href="route_with_country('meetups.events.edit', ['meetup' => $meetup, 'event' => $event])"
+                                    size="xs"
+                                    variant="ghost"
+                                    icon="pencil"
+                                >
+                                    {{ __('Bearbeiten') }}
+                                </flux:button>
                             @endif
-
-                            @if($event->description)
-                                <flux:text class="mt-2">{{ Str::limit($event->description, 100) }}</flux:text>
-                            @endif
-
-                            <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                                <div class="text-xs text-zinc-500 flex items-center gap-2">
-                                    <span>{{ count($event->attendees ?? []) }} Zusagen</span>
-                                    <flux:separator vertical/>
-                                    <span>{{ count($event->might_attendees ?? []) }} Vielleicht</span>
-                                </div>
-                            </flux:text>
-                        </flux:card>
-                    </a>
+                        </div>
+                    </flux:card>
                 @endforeach
             </div>
         </div>
