@@ -42,6 +42,9 @@ Route::middleware([])
         Volt::route('course/{course}/event/{event}', 'courses.landingpage-event')->name('courses.landingpage-event');
 
         Volt::route('lecturers', 'lecturers.index')->name('lecturers.index');
+
+        Volt::route('cities', 'cities.index')->name('cities.index');
+        Volt::route('venues', 'venues.index')->name('venues.index');
     });
 
 Route::middleware(['auth'])
@@ -60,6 +63,12 @@ Route::middleware(['auth'])
 
         Volt::route('lecturer-create', 'lecturers.create')->name('lecturers.create');
         Volt::route('lecturer-edit/{lecturer}', 'lecturers.edit')->name('lecturers.edit');
+
+        Volt::route('city-create', 'cities.create')->name('cities.create');
+        Volt::route('city-edit/{city}', 'cities.edit')->name('cities.edit');
+
+        Volt::route('venue-create', 'venues.create')->name('venues.create');
+        Volt::route('venue-edit/{venue}', 'venues.edit')->name('venues.edit');
     });
 
 Route::middleware(['auth'])

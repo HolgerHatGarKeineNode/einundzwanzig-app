@@ -47,9 +47,23 @@
                 {{ __('Dozenten') }}
             </flux:navlist.item>
         </flux:navlist.group>
-        {{--<flux:navlist.group :heading="__('Wallpaper')" class="grid">
 
-        </flux:navlist.group>--}}
+        <flux:navlist.group :heading="__('Diverses')" class="grid">
+            <flux:navlist.group :heading="__('Orte/Gebiete')" expandable :expanded="request()->routeIs('cities.*') || request()->routeIs('venues.*')">
+                <flux:navlist.item icon="building-office-2" :href="route_with_country('cities.index')"
+                                   :current="request()->routeIs('cities.index')"
+                                   wire:navigate
+                                   badge="{{ \App\Models\City::query()->count() }}">
+                    {{ __('Städte/Gebiete') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="map-pin" :href="route_with_country('venues.index')"
+                                   :current="request()->routeIs('venues.index')"
+                                   wire:navigate
+                                   badge="{{ \App\Models\Venue::query()->count() }}">
+                    {{ __('Veranstaltungsorte') }}
+                </flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist.group>
     </flux:navlist>
 
     <flux:spacer/>

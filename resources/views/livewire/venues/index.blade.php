@@ -1,0 +1,88 @@
+<?php
+
+use App\Models\Venue;
+use Livewire\Volt\Component;
+use Livewire\WithPagination;
+
+new class extends Component {
+    use WithPagination;
+
+    public $country = 'de';
+    public $search = '';
+
+    public function mount(): void
+    {
+        $this->country = request()->route('country');
+    }
+
+    public function with(): array
+    {
+        return [
+            'venues' => Venue::with(['city.country', 'createdBy'])
+                ->when($this->search, fn($query)
+                    => $query->where('name', 'ilike', '%'.$this->search.'%'),
+                )
+                ->orderBy('name')
+                ->paginate(15),
+        ];
+    }
+}; ?>
+
+<div>
+    <div class="flex items-center justify-between mb-6">
+        <flux:heading size="xl">{{ __('Venues') }}</flux:heading>
+        <div class="flex items-center gap-4">
+            <flux:input
+                wire:model.live="search"
+                :placeholder="__('Search venues...')"
+                clearable
+            />
+            @auth
+                <flux:button class="cursor-pointer" :href="route_with_country('venues.create')" icon="plus" variant="primary">
+                    {{ __('Create Venue') }}
+                </flux:button>
+            @endauth
+        </div>
+    </div>
+
+    <flux:table :paginate="$venues" class="mt-6">
+        <flux:table.columns>
+            <flux:table.column>{{ __('Name') }}</flux:table.column>
+            <flux:table.column>{{ __('City') }}</flux:table.column>
+            <flux:table.column>{{ __('Created By') }}</flux:table.column>
+            <flux:table.column>{{ __('Actions') }}</flux:table.column>
+        </flux:table.columns>
+
+        <flux:table.rows>
+            @foreach ($venues as $venue)
+                <flux:table.row :key="$venue->id">
+                    <flux:table.cell variant="strong">
+                        {{ $venue->name }}
+                    </flux:table.cell>
+                    <flux:table.cell>
+                        @if($venue->city)
+                            {{ $venue->city->name }}
+                            @if($venue->city->country)
+                                <span class="text-xs text-zinc-500">({{ $venue->city->country->name }})</span>
+                            @endif
+                        @endif
+                    </flux:table.cell>
+                    <flux:table.cell>
+                        @if($venue->createdBy)
+                            {{ $venue->createdBy->name }}
+                        @endif
+                    </flux:table.cell>
+                    <flux:table.cell>
+                        <div class="flex gap-2">
+                            @auth
+                                <flux:button size="sm" :href="route('venues.edit', ['venue' => $venue, 'country' => $country])" icon="pencil">
+                                    {{ __('Edit') }}
+                                </flux:button>
+                            @endauth
+                        </div>
+                    </flux:table.cell>
+                </flux:table.row>
+            @endforeach
+        </flux:table.rows>
+    </flux:table>
+</div>
