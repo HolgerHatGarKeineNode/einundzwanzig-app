@@ -21,6 +21,7 @@
         "livewire/flux-pro": "^2.2",
         "livewire/volt": "^1.7.0",
         "outhebox/blade-flags": "^1.5",
+        "ralphjsmit/laravel-seo": "^1.7",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/icalendar-generator": "^3.1",
         "spatie/laravel-ciphersweet": "^1.7",

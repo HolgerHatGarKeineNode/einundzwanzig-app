@@ -2,8 +2,30 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use Illuminate\Http\Request;
 
 Route::redirect('/', 'welcome');
+
+/*Route::get('/download-buecherverleih', function (Request $request) {
+    $filename = $request->input('filename');
+    // Get the file path from the public folder
+    $filePath = storage_path('app/'.$filename);
+    dd($filePath);
+    // Check if the file exists
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    // Generate a response with the file for download
+    return response()->download($filePath, $filename);
+})->name('buecherverleih.download');
+
+Route::middleware([])
+    ->get('/buecherverleih', \App\Livewire\BooksForPlebs\BookRentalGuide::class)
+    ->name('buecherverleih');*/
+
+Route::middleware([])
+    ->get('/kaninchenbau', \App\Livewire\Helper\FollowTheRabbit::class)
+    ->name('kaninchenbau');
 
 Route::get('/img/{path}', \App\Http\Controllers\ImageController::class)
     ->where('path', '.*')
@@ -35,7 +57,8 @@ Route::middleware([])
         Volt::route('meetups', 'meetups.index')->name('meetups.index');
         Volt::route('map', 'meetups.map')->name('meetups.map');
         Volt::route('meetup/{meetup:slug}', 'meetups.landingpage')->name('meetups.landingpage');
-        Volt::route('meetup/{meetup:slug}/event/{event}', 'meetups.landingpage-event')->name('meetups.landingpage-event');
+        Volt::route('meetup/{meetup:slug}/event/{event}',
+            'meetups.landingpage-event')->name('meetups.landingpage-event');
 
         Volt::route('courses', 'courses.index')->name('courses.index');
         Volt::route('course/{course}', 'courses.landingpage')->name('courses.landingpage');
@@ -79,5 +102,7 @@ Route::middleware(['auth'])
         Volt::route('settings/password', 'settings.password')->name('settings.password');
         Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     });
+
+Route::feeds();
 
 require __DIR__.'/auth.php';
