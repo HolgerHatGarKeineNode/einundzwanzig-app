@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\Database\CleanupLoginKeys;
+use App\Console\Commands\Nostr\PublishUnpublishedItems;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::command(CleanupLoginKeys::class)->everyFifteenMinutes();
+
+Schedule::command(PublishUnpublishedItems::class, [
+    '--model' => 'MeetupEvent',
+])->dailyAt('17:00');
+
+Schedule::command(PublishUnpublishedItems::class, [
+    '--model' => 'Meetup',
+])->dailyAt('18:00');
