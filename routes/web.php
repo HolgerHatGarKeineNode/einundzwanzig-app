@@ -21,6 +21,17 @@ Route::get('stream-calendar', \App\Http\Controllers\DownloadMeetupCalendar::clas
 Route::middleware([])
     ->prefix('/{country:code}')
     ->group(function () {
+        /* OLD URLS */
+        Route::get('/meetup/overview', function ($country) {
+            return redirect("/{$country}/meetups");
+        });
+        Route::get('/meetup/world', function ($country) {
+            return redirect("/{$country}/map");
+        });
+        Route::get('/meetup/meetup-events', function ($country) {
+            return redirect("/{$country}/meetups");
+        });
+
         Volt::route('meetups', 'meetups.index')->name('meetups.index');
         Volt::route('map', 'meetups.map')->name('meetups.map');
         Volt::route('meetup/{meetup:slug}', 'meetups.landingpage')->name('meetups.landingpage');
