@@ -70,7 +70,7 @@ new class extends Component {
             @foreach ($meetups as $meetup)
                 <flux:table.row :key="$meetup->id">
                     <flux:table.cell variant="strong" class="flex items-center gap-3">
-                            <flux:avatar :href="route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country])" src="{{ $meetup->getFirstMediaUrl('logo', 'thumb') }}"/>
+                            <flux:avatar :href="route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country])" src="{{ $meetup->getFirstMedia('logo') ? $meetup->getFirstMediaUrl('logo', 'thumb') : asset('android-chrome-512x512.png') }}"/>
                         <div>
                             @if($meetup->city)
                                 <a href="{{ route('meetups.landingpage', ['meetup' => $meetup, 'country' => $country]) }}">
