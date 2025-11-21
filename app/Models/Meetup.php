@@ -118,12 +118,13 @@ class Meetup extends Model implements HasMedia
 
         return Attribute::make(
             get: fn() => $nextEvent ? [
-                'start' => $nextEvent->start->toDateTimeString(),
-                'portalLink' => url()->route('meetup.event.landing', ['country' => $this->city->country, 'meetupEvent' => $nextEvent]),
+                'start' => $nextEvent->start,
+                'portalLink' => url()->route('meetups.landingpage-event', ['country' => $this->city->country, 'meetup' => $this, 'event' => $nextEvent]),
                 'location' => $nextEvent->location,
                 'description' => $nextEvent->description,
                 'link' => $nextEvent->link,
                 'attendees' => count($nextEvent->attendees ?? []),
+                'might_attendees' => count($nextEvent->might_attendees ?? []),
                 'nostr_note' => str($nextEvent->nostr_status)->after('Sent event ')->before(' to '),
             ] : null,
         );

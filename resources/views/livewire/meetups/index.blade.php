@@ -62,6 +62,7 @@ new class extends Component {
             <flux:table.column sortable :sorted="$sortBy === 'name'" :direction="$sortDirection"
                                wire:click="sort('name')">{{ __('Name') }}
             </flux:table.column>
+            <flux:table.column>{{ __('Nächster Termin') }}</flux:table.column>
             <flux:table.column>{{ __('Links') }}</flux:table.column>
             <flux:table.column>{{ __('Aktionen') }}</flux:table.column>
         </flux:table.columns>
@@ -85,6 +86,21 @@ new class extends Component {
                                 </a>
                             @endif
                         </div>
+                    </flux:table.cell>
+
+                    <flux:table.cell>
+                        @if($meetup->nextEvent && $meetup->nextEvent['start']->isFuture())
+                            <div class="flex flex-col gap-1">
+                                <flux:badge color="green" size="sm">
+                                    {{ $meetup->nextEvent['start']->format('d.m.Y H:i') }}
+                                </flux:badge>
+                                <div class="text-xs text-zinc-500 flex items-center gap-2">
+                                    <span>{{ $meetup->nextEvent['attendees'] }} Zusagen</span>
+                                    <flux:separator vertical/>
+                                    <span>{{ $meetup->nextEvent['might_attendees'] }} Vielleicht</span>
+                                </div>
+                            </div>
+                        @endif
                     </flux:table.cell>
 
                     <flux:table.cell>

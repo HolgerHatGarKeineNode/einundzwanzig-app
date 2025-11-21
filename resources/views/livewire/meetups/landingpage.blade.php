@@ -1,15 +1,27 @@
 <?php
 
 use App\Models\Meetup;
+use App\Models\MeetupEvent;
 use Livewire\Volt\Component;
 
 new class extends Component {
     public Meetup $meetup;
 
+    public $country = 'de';
+
+    public function mount(): void
+    {
+        $this->country = request()->route('country');
+    }
+
     public function with(): array
     {
         return [
             'meetup' => $this->meetup,
+            'events' => $this->meetup->meetupEvents()
+                ->where('start', '>=', now())
+                ->orderBy('start', 'asc')
+                ->get(),
         ];
     }
 }; ?>
@@ -165,4 +177,40 @@ new class extends Component {
             </div>
         </div>
     </div>
+
+    <!-- Events Section -->
+    @if($events->isNotEmpty())
+        <div class="mt-16">
+            <flux:heading size="xl" class="mb-6">{{ __('Kommende Veranstaltungen') }}</flux:heading>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($events as $event)
+                    <a href="{{ route('meetups.landingpage-event', ['meetup' => $meetup->slug, 'event' => $event->id, 'country' => $country]) }}" aria-label="{{ $event->description ?? 'Event details' }}">
+                        <flux:card size="sm" class="hover:bg-zinc-50 dark:hover:bg-zinc-700 h-full">
+                            <flux:heading class="flex items-center gap-2">
+                                {{ $event->start->format('d.m.Y') }}
+                                <flux:icon name="arrow-up-right" class="ml-auto text-zinc-400" variant="micro" />
+                            </flux:heading>
+
+                            <flux:text class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                                <flux:icon.clock class="inline w-4 h-4" />
+                                {{ $event->start->format('H:i') }} Uhr
+                            </flux:text>
+
+                            @if($event->location)
+                                <flux:text class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                                    <flux:icon.map-pin class="inline w-4 h-4" />
+                                    {{ $event->location }}
+                                </flux:text>
+                            @endif
+
+                            @if($event->description)
+                                <flux:text class="mt-2">{{ Str::limit($event->description, 100) }}</flux:text>
+                            @endif
+                        </flux:card>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>
